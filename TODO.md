@@ -14,13 +14,26 @@ Estado do projeto por fase. Ver AGENTS.md para o escopo completo de cada fase.
 
 Pendências / decisões futuras:
 
-- PinCode do operador (apontamento) fica para a Fase 1/5.
 - Convite de ADMIN/OPERADOR para um tenant existente: Fase 2 (cadastros/usuários).
 - Trial, onboarding guiado e billing: Fase 10.
 
-## Fase 1 — Modelo de dados
+## Fase 1 — Modelo de dados ✅
 
-- [ ] Não iniciada
+- [x] Migration `20260916000001_fase1_dominio.sql`: todas as entidades do domínio (clientes, máquinas, operações, motivos de parada, modelos/versões/partes/arquivos, consumo teórico, OS/grade/rolos, apontamentos, enfestos/sobras, consumíveis, fardos, romaneios)
+- [x] `pin_codes`: atalho de login do operador (membership com role OPERADOR + PIN hasheado)
+- [x] RLS de isolamento por tenant em todas as 25 tabelas de domínio (validado rodando as migrations num Postgres local)
+- [x] `supabase/seed.sql` com dados de referência (tenant/cliente/máquinas/modelo/OS de exemplo)
+- [x] ERD em Mermaid no README
+
+Decisões tomadas nesta fase:
+
+- Modelo pertence a um Cliente (`modelos.cliente_id` obrigatório), sem catálogo compartilhado entre clientes.
+- Operador não tem cadastro à parte: é uma `membership` com role OPERADOR; `pin_codes` só guarda o hash do PIN pra login rápido no tablet.
+- Enums fixos (Postgres `enum`) só para vocabulário fechado do domínio (tipo de máquina, status da OS, sentido do fio, tipo de arquivo/sobra, etc.); tabelas que o tenant customiza (máquinas, operações, motivos de parada) são linhas normais, não enum — o seed automático dessas linhas é a Fase 2.
+
+Pendências:
+
+- Não foi possível validar contra o Supabase local de verdade (Docker indisponível no sandbox); as migrations foram validadas num Postgres vazio com `auth.users`/`auth.uid()`/role `authenticated` simulados. Rode `npx supabase db reset` localmente para confirmar.
 
 ## Fase 2 — Cadastros e seed do setor
 
