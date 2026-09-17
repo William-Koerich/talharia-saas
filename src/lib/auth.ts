@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export type MembershipRole = "OWNER" | "ADMIN" | "OPERADOR";
@@ -5,6 +6,7 @@ export type MembershipRole = "OWNER" | "ADMIN" | "OPERADOR";
 export type SessaoAtual = {
   userId: string;
   email: string | null;
+  nome: string;
   tenantId: string;
   tenantNome: string;
   role: MembershipRole;
@@ -25,7 +27,7 @@ export async function getSessaoAtual(): Promise<SessaoAtual | null> {
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("tenant_id, role, tenants(nome)")
+    .select("tenant_id, role, nome, tenants(nome)")
     .eq("user_id", user.id)
     .limit(1)
     .maybeSingle();
@@ -35,8 +37,20 @@ export async function getSessaoAtual(): Promise<SessaoAtual | null> {
   return {
     userId: user.id,
     email: user.email ?? null,
+    nome: membership.nome,
     tenantId: membership.tenant_id,
     tenantNome: (membership.tenants as unknown as { nome: string }).nome,
     role: membership.role,
   };
+}
+
+/**
+ * Cadastros (clientes, máquinas, usuários etc.) são restritos a OWNER/ADMIN.
+ * Redireciona OPERADOR e visitantes não autenticados para fora da página.
+ */
+export async function exigirGestor(): Promise<SessaoAtual> {
+  const sessao = await getSessaoAtual();
+  if (!sessao) redirect("/entrar");
+  if (sessao.role === "OPERADOR") redirect("/painel");
+  return sessao;
 }

@@ -18,6 +18,10 @@ export function FormularioCadastro() {
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
+        <Label htmlFor="nome">Seu nome</Label>
+        <Input id="nome" name="nome" type="text" required autoComplete="name" />
+      </div>
+      <div className="flex flex-col gap-2">
         <Label htmlFor="nomeEmpresa">Nome da empresa</Label>
         <Input id="nomeEmpresa" name="nomeEmpresa" type="text" required />
       </div>

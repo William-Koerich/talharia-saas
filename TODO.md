@@ -14,8 +14,12 @@ Estado do projeto por fase. Ver AGENTS.md para o escopo completo de cada fase.
 
 Pendências / decisões futuras:
 
-- Convite de ADMIN/OPERADOR para um tenant existente: Fase 2 (cadastros/usuários).
 - Trial, onboarding guiado e billing: Fase 10.
+
+Correção feita durante a Fase 2: `/cadastro` passou a criar a conta via admin
+API (service role) já confirmada, em vez de `auth.signUp()` client-side — o
+projeto remoto tem confirmação de e-mail exigida por padrão e um limite de
+envio baixo no mailer embutido, o que travava o self-service.
 
 ## Fase 1 — Modelo de dados ✅
 
@@ -33,9 +37,24 @@ Decisões tomadas nesta fase:
 
 Pendências:
 
-- Não foi possível validar contra o Supabase local de verdade (Docker indisponível no sandbox); as migrations foram validadas num Postgres vazio com `auth.users`/`auth.uid()`/role `authenticated` simulados. Rode `npx supabase db reset` localmente para confirmar.
+- Migrations validadas num Postgres local (Docker indisponível no sandbox) e depois aplicadas e confirmadas no projeto remoto de verdade (ver Fase 2). `npx supabase db reset` local ainda não testado.
 
-## Fase 2 — Cadastros e seed do setor
+## Fase 2 — Cadastros e seed do setor ✅
+
+- [x] Trigger `seed_padrao_tenant`: ao criar um tenant, semeia 10 máquinas (uma por tipo), 8 operações e 8 motivos de parada padrão do setor
+- [x] CRUD completo (listar/criar/editar/ativar-desativar/excluir) para clientes, máquinas, operações, motivos de parada e consumíveis, restrito a OWNER/ADMIN (`exigirGestor`)
+- [x] Importação de clientes por CSV (`papaparse`)
+- [x] Usuários: OWNER/ADMIN cria ADMIN/OPERADOR com senha temporária (via admin API, conta já confirmada), remove membro, define/reseta PIN de 4 dígitos (hash com `scrypt`, sem dependência nova)
+- [x] Nav no `/painel` ligando todas as seções
+- [x] RLS: `memberships` ganhou policies de UPDATE/DELETE restritas a gestor (nunca sobre OWNER); `pin_codes` restrito a gestor (antes usava a policy genérica de tenant, que deixaria OPERADOR ler/escrever PIN de qualquer um)
+- [x] Validado de ponta a ponta contra o projeto remoto de verdade (cadastro → cliente → seed automático → usuário → PIN), depois limpo do banco
+
+Decisões tomadas nesta fase:
+
+- Novo ADMIN/OPERADOR é criado pelo gestor com senha temporária de uma vez (sem convite por e-mail — não há SMTP próprio configurado ainda).
+- `/cadastro` (Fase 0) foi corrigido pra criar a conta via admin API já confirmada, pelo mesmo motivo (ver nota na Fase 0).
+
+## Fase 3 — Biblioteca de modelos
 
 - [ ] Não iniciada
 

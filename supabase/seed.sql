@@ -9,21 +9,8 @@ insert into public.tenants (id, nome) values
 insert into public.clientes (id, tenant_id, nome, documento) values
   ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 'Confecção Modelo', '00.000.000/0001-00');
 
-insert into public.maquinas (tenant_id, nome, tipo, custo_hora) values
-  ('00000000-0000-0000-0000-000000000001', 'Mesa de Enfesto 1', 'mesa_enfesto_manual', 45.00),
-  ('00000000-0000-0000-0000-000000000001', 'Plotter de Risco', 'plotter_risco', 60.00),
-  ('00000000-0000-0000-0000-000000000001', 'Serra Fita 1', 'serra_fita', 35.00);
-
-insert into public.operacoes (tenant_id, nome) values
-  ('00000000-0000-0000-0000-000000000001', 'risco'),
-  ('00000000-0000-0000-0000-000000000001', 'enfesto'),
-  ('00000000-0000-0000-0000-000000000001', 'corte'),
-  ('00000000-0000-0000-0000-000000000001', 'separacao');
-
-insert into public.motivos_parada (tenant_id, nome) values
-  ('00000000-0000-0000-0000-000000000001', 'troca_lamina'),
-  ('00000000-0000-0000-0000-000000000001', 'falta_tecido'),
-  ('00000000-0000-0000-0000-000000000001', 'setup');
+-- máquinas/operações/motivos de parada deste tenant já vêm do trigger de
+-- seed automático (ver 20260917000000_fase2_seed_automatico.sql).
 
 insert into public.modelos (id, tenant_id, cliente_id, nome) values
   ('00000000-0000-0000-0000-000000000201', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000101', 'Camiseta Básica');
