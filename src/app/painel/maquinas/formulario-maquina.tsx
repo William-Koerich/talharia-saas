@@ -43,7 +43,8 @@ export function FormularioMaquina({
           <SelectTrigger id="tipo" className="w-full">
             <SelectValue>
               {(valor: string | null) =>
-                TIPOS_MAQUINA.find((t) => t.value === valor)?.label ?? "Selecione o tipo"
+                TIPOS_MAQUINA.find((t) => t.value === valor)?.label ??
+                "Selecione o tipo"
               }
             </SelectValue>
           </SelectTrigger>

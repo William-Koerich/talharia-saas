@@ -55,7 +55,9 @@ export function FormularioParte({
           <Select name="sentido_fio" defaultValue="indiferente">
             <SelectTrigger id="parte-sentido" className="w-full">
               <SelectValue>
-                {(valor: string | null) => (valor ? SENTIDO_FIO_LABEL[valor] : undefined)}
+                {(valor: string | null) =>
+                  valor ? SENTIDO_FIO_LABEL[valor] : undefined
+                }
               </SelectValue>
             </SelectTrigger>
             <SelectContent>

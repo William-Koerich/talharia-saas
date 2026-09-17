@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# gerado pelo Serwist no build (next.config.ts)
+/public/sw.js
+/public/sw.js.map
+
 # production
 /build
 

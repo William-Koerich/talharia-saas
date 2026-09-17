@@ -83,7 +83,8 @@ export function FormularioOS({
           <SelectTrigger id="cliente_id" className="w-full">
             <SelectValue>
               {(valor: string | null) =>
-                clientes.find((c) => c.id === valor)?.nome ?? "Selecione o cliente"
+                clientes.find((c) => c.id === valor)?.nome ??
+                "Selecione o cliente"
               }
             </SelectValue>
           </SelectTrigger>
@@ -103,9 +104,13 @@ export function FormularioOS({
           <SelectTrigger id="modelo_versao_id" className="w-full">
             <SelectValue>
               {(valor: string | null) => {
-                const modelo = modelosDoCliente.find((m) => m.modelo_versao_id === valor);
+                const modelo = modelosDoCliente.find(
+                  (m) => m.modelo_versao_id === valor,
+                );
                 if (modelo) return `${modelo.nome} (v${modelo.versao} vigente)`;
-                return clienteId ? "Selecione o modelo" : "Selecione um cliente primeiro";
+                return clienteId
+                  ? "Selecione o modelo"
+                  : "Selecione um cliente primeiro";
               }}
             </SelectValue>
           </SelectTrigger>

@@ -29,7 +29,9 @@ export function SeletorStatus({
     >
       <SelectTrigger className="w-56">
         <SelectValue>
-          {(valor: string | null) => OS_STATUS.find((s) => s.value === valor)?.label}
+          {(valor: string | null) =>
+            OS_STATUS.find((s) => s.value === valor)?.label
+          }
         </SelectValue>
       </SelectTrigger>
       <SelectContent>

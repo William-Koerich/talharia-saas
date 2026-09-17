@@ -35,7 +35,9 @@ export function FormularioRolo({
           <Select name="origem" defaultValue="proprio">
             <SelectTrigger id="origem" className="w-full">
               <SelectValue>
-                {(valor: string | null) => ORIGENS_ROLO.find((o) => o.value === valor)?.label}
+                {(valor: string | null) =>
+                  ORIGENS_ROLO.find((o) => o.value === valor)?.label
+                }
               </SelectValue>
             </SelectTrigger>
             <SelectContent>

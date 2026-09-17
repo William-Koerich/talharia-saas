@@ -27,6 +27,18 @@ Toda tabela de domínio carrega `tenant_id` e tem RLS habilitado, restringindo o
 
 Operador (talhador) tem conta normal (`memberships` com role `OPERADOR`); o PIN de 4 dígitos (`pin_codes`) é só um atalho de login no tablet.
 
+## Apontamento offline (`/apontar`)
+
+PWA de página única (380px, alto contraste) pro talhador: PIN → OS (câmera ou
+número) → máquina/operação → iniciar/pausar/retomar/finalizar. Funciona
+100% offline depois do primeiro carregamento online — service worker
+(Serwist) cacheia o app, IndexedDB guarda a fila de ações e os dados de
+referência (máquinas, operações, PINs). Sincroniza sozinho ao reconectar.
+
+Em produção, câmera e service worker exigem HTTPS (localhost fica isento
+em dev). Pra testar offline de verdade: abra `/apontar` uma vez online,
+depois DevTools → Network → Offline.
+
 ## Modelo de dados
 
 ```mermaid

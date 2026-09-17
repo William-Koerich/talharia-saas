@@ -92,7 +92,7 @@ export async function definirPin(
     {
       tenant_id: membership.tenant_id,
       membership_id: membership.id,
-      pin_hash: hashPin(pin),
+      pin_hash: await hashPin(pin),
     },
     { onConflict: "membership_id" },
   );

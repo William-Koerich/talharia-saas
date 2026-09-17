@@ -90,6 +90,37 @@ Decisão tomada nesta fase:
   (o escopo da Fase 4 menciona "vincular rolos com partida" dentro do fluxo
   da OS, não uma seção own separada).
 
+## Fase 5 — Apontamento (PWA offline-first) ✅
+
+- [x] `/apontar`: app de página única fora do `/painel`, 380px, alto contraste, sem scroll horizontal
+- [x] PIN de 4 dígitos → buscar OS (câmera/QR via `jsqr` ou número) → escolher máquina/operação → INICIAR/PAUSAR (motivo obrigatório)/RETOMAR/FINALIZAR (qtd + sobra)
+- [x] Hash de PIN trocado de scrypt (Node-only) pra PBKDF2 via Web Crypto — isomórfico, roda igual no servidor e no navegador
+- [x] `listar_pins_apontamento()`: libera leitura do hash de PIN (nunca o PIN em texto puro) pra qualquer membro do próprio tenant, não só gestor — trade-off deliberado pra permitir bater PIN 100% offline (decisão confirmada com o usuário)
+- [x] IndexedDB (`idb`): cache de referência (máquinas/operações/motivos/PINs/OS ativas) + fila de ações pendentes + apontamento ativo local — tudo sobrevive a reload/fechar o app
+- [x] Setup×produtivo classificado automaticamente **no servidor** (trigger `classificar_tipo_apontamento`): 1ª vez que uma combinação OS+operação+máquina é trabalhada = setup, demais = produtivo — decidido no servidor (não no cliente) pra ficar correto mesmo com ações sincronizadas fora de ordem
+- [x] Sync automática: tentativa imediata após cada ação + no evento `online` + retentativa a cada 20s como rede de segurança; conflito de "dois apontamentos ativos" resolvido por timestamp do dispositivo (o mais antigo vence, o outro é descartado com aviso)
+- [x] Service worker via `@serwist/turbopack` (o `@serwist/next` webpack não suporta Turbopack, que é o padrão do Next 16) servido por uma route `/[path]` com `generateStaticParams` restrito a `sw.js`/`sw.js.map`
+- [x] Manifest PWA (`app/manifest.ts`) com ícones gerados localmente (PIL)
+- [x] Validado de ponta a ponta contra o projeto remoto: fluxo completo online, fluxo completo **100% offline** (PIN, busca de OS, iniciar, finalizar — nada bloqueou por falta de rede), e sincronização automática ao reconectar (inclusive um caso real de resposta perdida exatamente na borda offline→online, recuperado sozinho pela retentativa de 20s)
+
+Bugs reais encontrados e corrigidos nesta fase:
+
+- `navigator.onLine` acessado direto no corpo do componente quebrava SSR — corrigido com `useSyncExternalStore`.
+- Duas rodadas de `setState` dentro de `useEffect` sem callback (efeito de sincronizar estado local com props, e assinatura de online/offline) — corrigidas com o padrão "ajustar estado durante o render" e `useSyncExternalStore`, respectivamente.
+- Chamadas concorrentes de sincronização (uma ação enfileirada logo após outra) eram **descartadas silenciosamente** pelo guard de reentrância em vez de serem enfileiradas pra rodar depois — uma ação podia ficar até 20s sem sincronizar mesmo com internet boa. Corrigido com um flag de "rodar de novo assim que a atual terminar".
+- Contador de "pendentes" não atualizava enquanto offline (a função só chamava `atualizarContagem()` dentro do caminho que tenta sincronizar de verdade, que retorna cedo sem rede).
+
+Decisões tomadas nesta fase:
+
+- PIN não troca a sessão Supabase do dispositivo — o tablet fica autenticado como quem configurou (OWNER/ADMIN/OPERADOR), e o PIN só resolve **qual membership** fez o apontamento (`operador_membership_id`). Muito mais simples que mintar uma sessão por operador a cada troca, e suficiente pro requisito.
+- Rolo/QR da OS usa o `numero` (inteiro, não UUID) como conteúdo do QR — mais curto e a RLS já isola por tenant.
+- Sem catálogo de "operadores" separado: continua sendo `memberships` + `pin_codes`, como decidido na Fase 0/2.
+
+Pendências / limitações conhecidas:
+
+- Resolução de conflito (dois ativos) testada via SQL direto, não via dois dispositivos reais simultâneos.
+- Sem teste de carregamento 100% frio do Service Worker (fechar o navegador inteiro e reabrir offline) — testado offline com o app já carregado, que é o caso de uso real (tablet fica ligado no chão de fábrica).
+
 ## Fase 5 — Apontamento (PWA offline-first)
 
 - [ ] Não iniciada

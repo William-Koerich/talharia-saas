@@ -41,7 +41,8 @@ export function FormularioModelo({
           <SelectTrigger id="cliente_id" className="w-full">
             <SelectValue>
               {(valor: string | null) =>
-                clientes.find((c) => c.id === valor)?.nome ?? "Selecione o cliente"
+                clientes.find((c) => c.id === valor)?.nome ??
+                "Selecione o cliente"
               }
             </SelectValue>
           </SelectTrigger>
