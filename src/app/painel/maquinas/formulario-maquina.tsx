@@ -41,7 +41,11 @@ export function FormularioMaquina({
         <Label htmlFor="tipo">Tipo</Label>
         <Select name="tipo" defaultValue={maquina?.tipo}>
           <SelectTrigger id="tipo" className="w-full">
-            <SelectValue placeholder="Selecione o tipo" />
+            <SelectValue>
+              {(valor: string | null) =>
+                TIPOS_MAQUINA.find((t) => t.value === valor)?.label ?? "Selecione o tipo"
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {TIPOS_MAQUINA.map((tipo) => (

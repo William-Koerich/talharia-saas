@@ -39,7 +39,11 @@ export function FormularioModelo({
         <Label htmlFor="cliente_id">Cliente</Label>
         <Select name="cliente_id" defaultValue={modelo?.cliente_id}>
           <SelectTrigger id="cliente_id" className="w-full">
-            <SelectValue placeholder="Selecione o cliente" />
+            <SelectValue>
+              {(valor: string | null) =>
+                clientes.find((c) => c.id === valor)?.nome ?? "Selecione o cliente"
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {clientes.map((cliente) => (

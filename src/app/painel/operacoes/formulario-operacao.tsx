@@ -46,7 +46,11 @@ export function FormularioOperacao({
           defaultValue={operacao?.maquina_padrao_id ?? ""}
         >
           <SelectTrigger id="maquina_padrao_id" className="w-full">
-            <SelectValue placeholder="Nenhuma" />
+            <SelectValue>
+              {(valor: string | null) =>
+                maquinas.find((m) => m.id === valor)?.nome ?? "Nenhuma"
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">Nenhuma</SelectItem>

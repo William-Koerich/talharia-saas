@@ -15,6 +15,12 @@ import type { EstadoForm } from "./actions";
 
 const estadoInicial: EstadoForm = { erro: null };
 
+const SENTIDO_FIO_LABEL: Record<string, string> = {
+  fio_reto: "Fio reto",
+  vies: "Viés",
+  indiferente: "Indiferente",
+};
+
 export function FormularioParte({
   acao,
 }: {
@@ -48,7 +54,9 @@ export function FormularioParte({
           <Label htmlFor="parte-sentido">Sentido do fio</Label>
           <Select name="sentido_fio" defaultValue="indiferente">
             <SelectTrigger id="parte-sentido" className="w-full">
-              <SelectValue />
+              <SelectValue>
+                {(valor: string | null) => (valor ? SENTIDO_FIO_LABEL[valor] : undefined)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="fio_reto">Fio reto</SelectItem>

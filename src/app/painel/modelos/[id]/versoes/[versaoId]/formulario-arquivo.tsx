@@ -35,7 +35,11 @@ export function FormularioArquivo({
         <Label htmlFor="tipo">Tipo</Label>
         <Select name="tipo" defaultValue="croqui">
           <SelectTrigger id="tipo" className="w-44">
-            <SelectValue />
+            <SelectValue>
+              {(valor: string | null) =>
+                TIPOS_ARQUIVO_MODELO.find((t) => t.value === valor)?.label
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {TIPOS_ARQUIVO_MODELO.map((tipo) => (

@@ -65,9 +65,30 @@ Decisões tomadas nesta fase:
 - [x] RLS de `modelos`/`modelo_versoes`/`modelo_partes`/`modelo_arquivos`/`consumo_teorico_tamanho` endurecida pro mesmo padrão leitura-livre/escrita-gestor (vieram da Fase 1 com a policy genérica de tenant, que deixava qualquer membro escrever)
 - [x] Validado de ponta a ponta contra o projeto remoto (modelo → versão 1 vigente → partes/consumo/arquivos → nova versão → trocar vigente), arquivos e dados de teste limpos depois
 
-## Fase 4 — Ordem de Serviço
+## Fase 4 — Ordem de Serviço ✅
 
-- [ ] Não iniciada
+- [x] `criar_os` (função) cria a OS + grade (tamanho×cor×qtd) numa transação; cliente → modelo usa sempre a versão vigente automaticamente (sem escolha manual de versão)
+- [x] Esteira kanban em `/painel/os` por status (`@dnd-kit`), com fallback de select de status na página de detalhe (mesma ação, dois caminhos)
+- [x] Vincular rolos à OS com partida/origem/metragem/metros consumidos; aviso explícito quando os rolos vinculados têm partidas diferentes
+- [x] Ficha imprimível (`/painel/os/[id]/ficha`) com QR code (`qrcode`, conteúdo = número da OS) e CSS `print:hidden` no chrome do painel
+- [x] Alerta na OS quando a versão do modelo usada não é mais a vigente (badge no card do kanban e aviso no detalhe)
+- [x] RLS de `ordens_servico`/`os_grades`/`rolos`/`os_rolo_consumo` endurecida pro padrão leitura-livre/escrita-gestor (mesma correção das Fases 2/3)
+- [x] Validado de ponta a ponta contra o projeto remoto, incluindo o drag-and-drop de verdade (mouse down/move/up) no kanban
+
+Bug real encontrado e corrigido nesta fase (afetava todo `Select` do app, não só
+OS): o `Select.Value` do Base UI renderiza o **valor bruto** por padrão — só
+mostra o rótulo do item se você passar uma função `children` que faça esse
+mapeamento (ou usar a prop `items`). Todo `<SelectValue placeholder="..." />`
+sem `children` estava mostrando UUID/enum cru assim que uma opção era
+selecionada (ex.: cliente aparecia como UUID em vez do nome). Corrigido em
+todos os selects do app (clientes, máquinas, operações, modelos, arquivos,
+partes, rolos, status da OS).
+
+Decisão tomada nesta fase:
+
+- Rolo não tem catálogo/CRUD próprio — é criado inline ao vincular numa OS
+  (o escopo da Fase 4 menciona "vincular rolos com partida" dentro do fluxo
+  da OS, não uma seção own separada).
 
 ## Fase 5 — Apontamento (PWA offline-first)
 
