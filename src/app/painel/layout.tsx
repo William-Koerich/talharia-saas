@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const LINKS_GESTOR = [
   { href: "/painel/clientes", label: "Clientes" },
+  { href: "/painel/modelos", label: "Modelos" },
   { href: "/painel/maquinas", label: "Máquinas" },
   { href: "/painel/operacoes", label: "Operações" },
   { href: "/painel/motivos-parada", label: "Motivos de parada" },

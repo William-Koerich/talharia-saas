@@ -54,13 +54,16 @@ Decisões tomadas nesta fase:
 - Novo ADMIN/OPERADOR é criado pelo gestor com senha temporária de uma vez (sem convite por e-mail — não há SMTP próprio configurado ainda).
 - `/cadastro` (Fase 0) foi corrigido pra criar a conta via admin API já confirmada, pelo mesmo motivo (ver nota na Fase 0).
 
-## Fase 3 — Biblioteca de modelos
+## Fase 3 — Biblioteca de modelos ✅
 
-- [ ] Não iniciada
-
-## Fase 3 — Biblioteca de modelos
-
-- [ ] Não iniciada
+- [x] Storage privado (`arquivos`) com RLS por pasta de tenant: leitura pra qualquer membro, escrita só gestor
+- [x] `criar_modelo` (função) cria modelo + versão 1 vigente numa transação; `marcar_versao_vigente` troca a vigente atomicamente (só uma por modelo, via índice único parcial)
+- [x] CRUD de modelo (nome + cliente) e de versão (largura exigida, eficiência do encaixe)
+- [x] Partes e grade/consumo teórico por tamanho editáveis dentro da versão
+- [x] Upload de croqui/foto, risco (PDF), .plt e .dxf; preview de imagem (`<img>`) e PDF (`<iframe>`) via signed URL de 5 min; plt/dxf só link de download
+- [x] Aviso explícito na versão não vigente ("não pode ser usada em novas Ordens de Serviço") — o bloqueio de fato na criação da OS é Fase 4
+- [x] RLS de `modelos`/`modelo_versoes`/`modelo_partes`/`modelo_arquivos`/`consumo_teorico_tamanho` endurecida pro mesmo padrão leitura-livre/escrita-gestor (vieram da Fase 1 com a policy genérica de tenant, que deixava qualquer membro escrever)
+- [x] Validado de ponta a ponta contra o projeto remoto (modelo → versão 1 vigente → partes/consumo/arquivos → nova versão → trocar vigente), arquivos e dados de teste limpos depois
 
 ## Fase 4 — Ordem de Serviço
 
