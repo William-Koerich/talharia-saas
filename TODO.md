@@ -125,9 +125,18 @@ Pendências / limitações conhecidas:
 
 - [ ] Não iniciada
 
-## Fase 6 — Enfesto e aproveitamento
+## Fase 6 — Enfesto e aproveitamento ✅
 
-- [ ] Não iniciada
+- [x] `rolos.custo_metro` (opcional) — base pra calcular sobra em R$
+- [x] RLS de `enfestos`/`enfesto_rolos`/`sobras` endurecida pro padrão leitura-livre/escrita-gestor (mesma correção das Fases 2-4)
+- [x] View `os_aproveitamento` (`security_invoker = true`) com consumo teórico (grade × consumo_teorico_tamanho) × real (folhas × comprimento dos enfestos) × perda em metros e % por OS — testada explicitamente contra vazamento entre tenants (dois tenants, dois usuários, confirmado que um não vê a OS do outro)
+- [x] `/painel/os/[id]`: seções de Enfesto (folhas, comprimento, quais rolos já vinculados à OS foram consumidos) e Sobra (tipo, metros, valor — se não informado manualmente, calculado a partir do custo médio ponderado dos rolos da OS); resumo teórico×real×perda no topo da seção de enfestos
+- [x] `/painel/relatorios/perdas`: filtro por período/cliente/modelo, agrupado por modelo e por cliente, com badge de desvio (pp) contra a média geral do período filtrado
+- [x] Validado de ponta a ponta contra o projeto remoto com números exatos (teórico 10m, real 14m, perda 28,57%, sobra calculada em R$10,00 a partir do custo do rolo)
+
+Decisão tomada nesta fase:
+
+- "Média" de comparação no relatório é agregada (perda total / real total do grupo), não a média simples dos percentuais por OS — evita que uma OS pequena distorça o comparativo tanto quanto uma grande.
 
 ## Fase 7 — Custos, margem e tempo padrão
 

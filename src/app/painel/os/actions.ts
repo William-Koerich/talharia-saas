@@ -126,6 +126,7 @@ export async function adicionarRolo(
     const metragem = Number(formData.get("metragem") ?? 0);
     const largura = formData.get("largura");
     const cor = String(formData.get("cor") ?? "").trim() || null;
+    const custoMetro = formData.get("custo_metro");
 
     if (!metragem) return { erro: "Informe a metragem do rolo." };
 
@@ -139,6 +140,7 @@ export async function adicionarRolo(
         metragem,
         largura: largura ? Number(largura) : null,
         cor,
+        custo_metro: custoMetro ? Number(custoMetro) : null,
       })
       .select("id")
       .single();

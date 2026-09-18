@@ -92,6 +92,16 @@ export function FormularioRolo({
           />
         </div>
       </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="custo_metro">Custo por metro (R$) — opcional</Label>
+        <Input
+          id="custo_metro"
+          name="custo_metro"
+          type="number"
+          step="0.01"
+          min="0"
+        />
+      </div>
       {estado.erro && <p className="text-destructive text-sm">{estado.erro}</p>}
       <Button type="submit" disabled={pending} className="self-start">
         {pending ? "Vinculando..." : "Vincular rolo"}

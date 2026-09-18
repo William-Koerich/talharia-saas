@@ -30,8 +30,14 @@ function inscreverStatusRede(callback: () => void) {
 }
 
 export function ApontamentoApp() {
-  const { referencia, pendentes, sincronizando, aviso, limparAviso, sincronizarAgora } =
-    useSincronizacao();
+  const {
+    referencia,
+    pendentes,
+    sincronizando,
+    aviso,
+    limparAviso,
+    sincronizarAgora,
+  } = useSincronizacao();
   const [tela, setTela] = useState<Tela>("carregando");
   const [operador, setOperador] = useState<Operador | null>(null);
   const [osSelecionada, setOsSelecionada] = useState<OSAtiva | null>(null);
