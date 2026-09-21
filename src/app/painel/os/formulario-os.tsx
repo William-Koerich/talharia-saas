@@ -35,12 +35,15 @@ const estadoInicial: EstadoForm = { erro: null };
 export function FormularioOS({
   clientes,
   modelos,
+  horasPorPecaPorModelo,
 }: {
   clientes: Cliente[];
   modelos: Modelo[];
+  horasPorPecaPorModelo: Record<string, number>;
 }) {
   const [estado, formAction, pending] = useActionState(criarOS, estadoInicial);
   const [clienteId, setClienteId] = useState("");
+  const [modeloVersaoId, setModeloVersaoId] = useState("");
   const [grade, setGrade] = useState<ItemGrade[]>([
     { tamanho: "", cor: "", quantidade: 0 },
   ]);
@@ -48,6 +51,17 @@ export function FormularioOS({
   const modelosDoCliente = useMemo(
     () => modelos.filter((m) => m.cliente_id === clienteId),
     [modelos, clienteId],
+  );
+
+  const modeloSelecionado = modelosDoCliente.find(
+    (m) => m.modelo_versao_id === modeloVersaoId,
+  );
+  const horasPorPeca = modeloSelecionado
+    ? horasPorPecaPorModelo[modeloSelecionado.id]
+    : undefined;
+  const quantidadeTotal = grade.reduce(
+    (soma, item) => soma + item.quantidade,
+    0,
   );
 
   function atualizarItem(index: number, campo: keyof ItemGrade, valor: string) {
@@ -100,7 +114,13 @@ export function FormularioOS({
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="modelo_versao_id">Modelo</Label>
-        <Select key={clienteId} name="modelo_versao_id" disabled={!clienteId}>
+        <Select
+          key={clienteId}
+          name="modelo_versao_id"
+          disabled={!clienteId}
+          value={modeloVersaoId}
+          onValueChange={(v) => setModeloVersaoId(v ?? "")}
+        >
           <SelectTrigger id="modelo_versao_id" className="w-full">
             <SelectValue>
               {(valor: string | null) => {
@@ -211,6 +231,12 @@ export function FormularioOS({
         >
           Adicionar tamanho
         </Button>
+        {horasPorPeca != null && quantidadeTotal > 0 && (
+          <p className="text-muted-foreground text-sm">
+            Tempo estimado: {(horasPorPeca * quantidadeTotal).toFixed(1)}h
+            (baseado no histórico de apontamentos deste modelo)
+          </p>
+        )}
       </div>
 
       <input type="hidden" name="grade" value={JSON.stringify(grade)} />

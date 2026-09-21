@@ -21,6 +21,7 @@ export async function criarUsuario(
   const email = String(formData.get("email") ?? "").trim();
   const senha = String(formData.get("senha") ?? "");
   const role = String(formData.get("role") ?? "") as MembershipRole;
+  const custoHora = formData.get("custo_hora");
 
   if (!nome) return { erro: "Informe o nome." };
   if (!PAPEIS_CRIAVEIS.includes(role))
@@ -50,6 +51,7 @@ export async function criarUsuario(
     role,
     nome,
     email,
+    custo_hora: custoHora ? Number(custoHora) : null,
   });
 
   if (erroMembership) {
@@ -66,6 +68,26 @@ export async function removerUsuario(id: string) {
   const supabase = await createClient();
   await supabase.from("memberships").delete().eq("id", id);
   revalidatePath("/painel/usuarios");
+}
+
+export async function atualizarCustoHora(
+  membershipId: string,
+  _estado: EstadoForm,
+  formData: FormData,
+): Promise<EstadoForm> {
+  await exigirGestor();
+  const custoHora = formData.get("custo_hora");
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("memberships")
+    .update({ custo_hora: custoHora ? Number(custoHora) : null })
+    .eq("id", membershipId);
+
+  if (error) return { erro: "Não foi possível salvar o custo por hora." };
+
+  revalidatePath("/painel/usuarios");
+  redirect("/painel/usuarios");
 }
 
 export async function definirPin(

@@ -47,6 +47,16 @@ export function FormularioUsuario() {
           </SelectContent>
         </Select>
       </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="custo_hora">Custo por hora (R$) — opcional</Label>
+        <Input
+          id="custo_hora"
+          name="custo_hora"
+          type="number"
+          step="0.01"
+          min="0"
+        />
+      </div>
       {estado.erro && <p className="text-destructive text-sm">{estado.erro}</p>}
       <Button type="submit" disabled={pending}>
         {pending ? "Criando..." : "Criar usuário"}

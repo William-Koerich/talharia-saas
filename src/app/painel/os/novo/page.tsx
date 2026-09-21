@@ -6,18 +6,22 @@ export default async function PaginaNovaOS() {
   await exigirGestor();
 
   const supabase = await createClient();
-  const [{ data: clientes }, { data: modelosData }] = await Promise.all([
-    supabase
-      .from("clientes")
-      .select("id, nome")
-      .eq("ativo", true)
-      .order("nome"),
-    supabase
-      .from("modelo_versoes")
-      .select("id, versao, modelos!inner(id, nome, cliente_id, ativo)")
-      .eq("vigente", true)
-      .eq("modelos.ativo", true),
-  ]);
+  const [{ data: clientes }, { data: modelosData }, { data: temposPadrao }] =
+    await Promise.all([
+      supabase
+        .from("clientes")
+        .select("id, nome")
+        .eq("ativo", true)
+        .order("nome"),
+      supabase
+        .from("modelo_versoes")
+        .select("id, versao, modelos!inner(id, nome, cliente_id, ativo)")
+        .eq("vigente", true)
+        .eq("modelos.ativo", true),
+      supabase
+        .from("tempo_padrao_modelo_operacao")
+        .select("modelo_id, horas_por_peca"),
+    ]);
 
   const modelos = (modelosData ?? [])
     .map((mv) => {
@@ -36,10 +40,22 @@ export default async function PaginaNovaOS() {
     })
     .sort((a, b) => a.nome.localeCompare(b.nome));
 
+  const horasPorPecaPorModelo = new Map<string, number>();
+  for (const t of temposPadrao ?? []) {
+    horasPorPecaPorModelo.set(
+      t.modelo_id,
+      (horasPorPecaPorModelo.get(t.modelo_id) ?? 0) + Number(t.horas_por_peca),
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold">Nova ordem de serviço</h1>
-      <FormularioOS clientes={clientes ?? []} modelos={modelos} />
+      <FormularioOS
+        clientes={clientes ?? []}
+        modelos={modelos}
+        horasPorPecaPorModelo={Object.fromEntries(horasPorPecaPorModelo)}
+      />
     </div>
   );
 }

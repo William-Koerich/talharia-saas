@@ -138,9 +138,21 @@ Decisão tomada nesta fase:
 
 - "Média" de comparação no relatório é agregada (perda total / real total do grupo), não a média simples dos percentuais por OS — evita que uma OS pequena distorça o comparativo tanto quanto uma grande.
 
-## Fase 7 — Custos, margem e tempo padrão
+## Fase 7 — Custos, margem e tempo padrão ✅
 
-- [ ] Não iniciada
+- [x] `memberships.custo_hora` (mão de obra, análogo ao `maquinas.custo_hora` já existente)
+- [x] View `os_custos` (`security_invoker`): custo = tempo de máquina (só setup+produtivo, parada não entra — decisão confirmada com o usuário) × custo_hora da máquina + mesmo tempo × custo_hora de quem apontou + consumíveis + tecido só quando o rolo é próprio; margem = preço acordado − custo; testada contra vazamento entre tenants
+- [x] View `tempo_padrao_modelo_operacao`: média de horas por peça por (modelo, operação), só a partir de 3 apontamentos produtivos concluídos (setup fica de fora, é overhead de uma vez só)
+- [x] `/painel/os/[id]`: seção de custos e margem, com destaque quando a OS está deficitária
+- [x] `/painel/relatorios/margem`: margem agregada por cliente (filtro de período/cliente), com badge "Deficitário"
+- [x] `/painel/os/novo`: "tempo estimado" (horas) baseado no tempo padrão × quantidade da grade, quando há histórico suficiente
+- [x] `/painel` (OWNER/ADMIN) virou o dashboard: OS atrasadas, ocupação por máquina (mês atual), top 5 motivos de parada (mês atual), margem do mês
+- [x] `/painel/usuarios`: coluna e tela de custo/hora por usuário (`/painel/usuarios/[id]/custo-hora`)
+- [x] Validado de ponta a ponta contra o projeto remoto com números exatos (custo máquina R$60, mão de obra R$40, consumíveis R$12, total R$112, margem R$888/88,8%) refletidos corretamente na OS, no relatório de margem e no dashboard
+
+Decisão tomada nesta fase:
+
+- Tempo de parada nunca entra no custo da OS — é perda operacional rastreada separadamente (top motivos de parada no dashboard), não custo repassável.
 
 ## Fase 8 — Etiquetas e entrega
 

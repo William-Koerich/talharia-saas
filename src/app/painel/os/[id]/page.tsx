@@ -31,6 +31,10 @@ const ROTULO_TIPO_SOBRA: Record<string, string> = {
   emenda: "Emenda",
 };
 
+function formatarReais(valor: number) {
+  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 export default async function PaginaOSDetalhe({
   params,
 }: PageProps<"/painel/os/[id]">) {
@@ -45,6 +49,7 @@ export default async function PaginaOSDetalhe({
     { data: enfestosData },
     { data: sobrasData },
     { data: aproveitamento },
+    { data: custos },
   ] = await Promise.all([
     supabase
       .from("ordens_servico")
@@ -77,6 +82,13 @@ export default async function PaginaOSDetalhe({
     supabase
       .from("os_aproveitamento")
       .select("consumo_teorico, consumo_real, perda_metros, perda_percentual")
+      .eq("os_id", id)
+      .maybeSingle(),
+    supabase
+      .from("os_custos")
+      .select(
+        "custo_maquina, custo_mao_de_obra, custo_consumiveis, custo_tecido_proprio, custo_total, margem, margem_percentual",
+      )
       .eq("os_id", id)
       .maybeSingle(),
   ]);
@@ -343,6 +355,43 @@ export default async function PaginaOSDetalhe({
         </Table>
         <FormularioSobra enfestos={enfestos} acao={criarSobra.bind(null, id)} />
       </section>
+
+      {custos && (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold">Custos e margem</h2>
+          <div className="bg-muted flex flex-wrap gap-4 rounded p-3 text-sm">
+            <span>Máquina: {formatarReais(Number(custos.custo_maquina))}</span>
+            <span>
+              Mão de obra: {formatarReais(Number(custos.custo_mao_de_obra))}
+            </span>
+            <span>
+              Consumíveis: {formatarReais(Number(custos.custo_consumiveis))}
+            </span>
+            <span>
+              Tecido próprio:{" "}
+              {formatarReais(Number(custos.custo_tecido_proprio))}
+            </span>
+            <span className="font-medium">
+              Custo total: {formatarReais(Number(custos.custo_total))}
+            </span>
+          </div>
+          <p className="text-sm">
+            Margem:{" "}
+            <span
+              className={
+                Number(custos.margem) < 0
+                  ? "text-destructive font-medium"
+                  : "font-medium"
+              }
+            >
+              {formatarReais(Number(custos.margem))}
+              {custos.margem_percentual != null &&
+                ` (${custos.margem_percentual}%)`}
+            </span>
+            {Number(custos.margem) < 0 && " — esta OS está deficitária"}
+          </p>
+        </section>
+      )}
 
       <form action={excluirOS.bind(null, id)}>
         <Button variant="destructive" type="submit">

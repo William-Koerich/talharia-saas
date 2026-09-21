@@ -19,7 +19,7 @@ export default async function PaginaUsuarios() {
   const supabase = await createClient();
   const { data: usuarios } = await supabase
     .from("memberships")
-    .select("id, nome, email, role, pin_codes(id)")
+    .select("id, nome, email, role, custo_hora, pin_codes(id)")
     .order("nome");
 
   return (
@@ -41,6 +41,7 @@ export default async function PaginaUsuarios() {
             <TableHead>E-mail</TableHead>
             <TableHead>Papel</TableHead>
             <TableHead>PIN</TableHead>
+            <TableHead>Custo/hora</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -53,7 +54,25 @@ export default async function PaginaUsuarios() {
                 <Badge variant="secondary">{usuario.role}</Badge>
               </TableCell>
               <TableCell>{usuario.pin_codes ? "Definido" : "—"}</TableCell>
+              <TableCell>
+                {usuario.custo_hora != null
+                  ? Number(usuario.custo_hora).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                  : "—"}
+              </TableCell>
               <TableCell className="flex justify-end gap-2 text-right">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  render={
+                    <Link href={`/painel/usuarios/${usuario.id}/custo-hora`} />
+                  }
+                  nativeButton={false}
+                >
+                  Custo/hora
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
