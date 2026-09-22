@@ -1,7 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/entrar", "/cadastro"];
+// Páginas de auth: redirecionam pra /painel se o usuário já estiver logado.
+const AUTH_PATHS = ["/entrar", "/cadastro"];
+// Públicas sem redirecionamento algum (acessíveis logado ou não) — o portal
+// do cliente usa um token na própria URL como autorização.
+const PUBLIC_PATHS = [...AUTH_PATHS, "/portal"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -41,7 +45,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isPublicPath) {
+  const isAuthPath = AUTH_PATHS.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  );
+
+  if (user && isAuthPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/painel";
     return NextResponse.redirect(url);

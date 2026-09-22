@@ -62,6 +62,13 @@ export async function alternarAtivoCliente(id: string, ativo: boolean) {
   revalidatePath("/painel/clientes");
 }
 
+export async function regenerarPortalLink(id: string) {
+  await exigirGestor();
+  const supabase = await createClient();
+  await supabase.rpc("regenerar_portal_token", { p_cliente_id: id });
+  revalidatePath(`/painel/clientes/${id}`);
+}
+
 export async function excluirCliente(id: string) {
   await exigirGestor();
   const supabase = await createClient();

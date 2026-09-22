@@ -170,13 +170,18 @@ Bugs corrigidos nesta fase:
 
 - `captura-entrega.tsx` (novo) e `apontar/tela-buscar-os.tsx` (Fase 5, achado ao reaproveitar o mesmo padrão): a câmera nunca funcionava de verdade. O `<video>` só era montado no DOM depois de `setEscaneando(true)`/`setCameraAtiva(true)`, mas o código tentava atribuir `srcObject` a `videoRef.current` *antes* dessa mudança de estado — ou seja, o ref sempre estava `null` nesse momento e o stream nunca era conectado ao elemento. Ninguém percebeu porque o vídeo aparecia (elemento existe após o re-render) e o loop de leitura de QR simplesmente ficava girando sem erro, sem nunca ler nada. Corrigido montando o `<video>` sempre (oculto via classe, mesmo padrão já usado no `<canvas>`), então o ref existe antes do `getUserMedia` resolver. Confirmado com diagnóstico ao vivo (câmera fake do Chrome): antes da correção `videoWidth: 0, hasSrcObject: false`; depois, `videoWidth: 640, hasSrcObject: true`. **Isso significa que a leitura de QR no tablet do talhador (`/apontar`, Fase 5 CRÍTICA) nunca funcionou em produção até este fix** — só a busca manual por número da OS funcionava.
 
-## Fase 9 — Portal do cliente
+## Fase 9 — Portal do cliente ✅
 
-- [ ] Não iniciada
+- [x] Migration: `clientes.portal_token` (uuid único, `default gen_random_uuid()`) + `regenerar_portal_token()` (RPC, `security invoker`)
+- [x] `/portal/[token]`: página pública (sem login) — lista as OS do cliente (número, modelo, status, prazo) e as entregas (status, data, link pra baixar o PDF do romaneio quando entregue). Usa a service role filtrando só pelo token, não RLS de `anon`
+- [x] `/portal/[token]/romaneios/[id]/pdf`: download do PDF do romaneio, validando que o romaneio pertence ao cliente do token
+- [x] `proxy.ts`: `/portal` liberado como rota pública, sem redirecionar pra `/entrar`; gestor logado consegue abrir o próprio link do portal sem ser jogado de volta pro `/painel`
+- [x] `/painel/clientes/[id]`: seção "Portal do cliente" com o link, botão de copiar e "gerar novo link" (invalida o anterior)
+- [x] Validado de ponta a ponta: acesso sem sessão, OS e romaneio corretos, download de PDF via token, token inválido → 404, regenerar link invalida o antigo (404) e o novo funciona (200)
 
-## Fase 9 — Portal do cliente
+Decisão tomada nesta fase (confirmada com o usuário):
 
-- [ ] Não iniciada
+- Acesso ao portal é por link único por cliente com token na URL, sem senha — não criamos autenticação nova pro cliente. Mais simples de compartilhar (WhatsApp/e-mail) e evita gestão de credenciais fora do escopo desta fase.
 
 ## Fase 10 — Self-service e billing
 
