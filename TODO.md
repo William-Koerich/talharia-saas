@@ -183,6 +183,17 @@ Decisão tomada nesta fase (confirmada com o usuário):
 
 - Acesso ao portal é por link único por cliente com token na URL, sem senha — não criamos autenticação nova pro cliente. Mais simples de compartilhar (WhatsApp/e-mail) e evita gestão de credenciais fora do escopo desta fase.
 
-## Fase 10 — Self-service e billing
+## Fase 10 — Self-service e billing ✅
 
-- [ ] Não iniciada
+- [x] Migration: `tenants.trial_termina_em` (default `now() + 14 dias`) e `tenants.assinatura_ativa` (default `false`); tenants já existentes (o do usuário incluso) foram marcados `assinatura_ativa = true` na própria migration pra não perder acesso
+- [x] `getSessaoAtual()`: calcula `trialExpirado` e `diasRestantesTrial` a partir de `assinatura_ativa`/`trial_termina_em`
+- [x] `/painel/layout.tsx`: acesso liberado normalmente durante o trial (com um aviso discreto de dias restantes) e bloqueado (tela dedicada, só com botão "Sair") quando o trial expira sem assinatura ativa
+- [x] Validado de ponta a ponta: cadastro novo começa em trial (14 dias, banner correto), trial expirado bloqueia o `/painel` inteiro (nav some), reativar `assinatura_ativa` libera o acesso de novo e tira o banner
+
+Decisões tomadas nesta fase (confirmadas com o usuário):
+
+- Sem gateway de pagamento real — só o estado de acesso (trial/ativo) é modelado. Cobrança e ativação da assinatura são manuais (combinadas fora do sistema); não há checkout nem processamento de cartão/pix/boleto nesta fase.
+- Trial de 14 dias a partir do cadastro.
+- Trial expirado bloqueia o `/painel` inteiro (não é modo somente-leitura).
+
+Limitação conhecida: o bloqueio cobre o `/painel` (dono/staff). O `/apontar` (tablet do talhador, offline-first) não foi incluído no gate — bloquear uma PWA offline por expiração de trial exigiria um mecanismo próprio (checagem em sync, não em cada tela) e não foi pedido explicitamente; ficou de fora do escopo desta fase.

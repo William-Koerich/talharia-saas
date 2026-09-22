@@ -10,6 +10,10 @@ export type SessaoAtual = {
   tenantId: string;
   tenantNome: string;
   role: MembershipRole;
+  assinaturaAtiva: boolean;
+  trialTerminaEm: string;
+  trialExpirado: boolean;
+  diasRestantesTrial: number;
 };
 
 /**
@@ -27,20 +31,37 @@ export async function getSessaoAtual(): Promise<SessaoAtual | null> {
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("tenant_id, role, nome, tenants(nome)")
+    .select("tenant_id, role, nome, tenants(nome, assinatura_ativa, trial_termina_em)")
     .eq("user_id", user.id)
     .limit(1)
     .maybeSingle();
 
   if (!membership) return null;
 
+  const tenant = membership.tenants as unknown as {
+    nome: string;
+    assinatura_ativa: boolean;
+    trial_termina_em: string;
+  };
+
+  const trialTerminaEm = new Date(tenant.trial_termina_em);
+  const trialExpirado = !tenant.assinatura_ativa && new Date() >= trialTerminaEm;
+  const diasRestantesTrial = Math.max(
+    0,
+    Math.ceil((trialTerminaEm.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+  );
+
   return {
     userId: user.id,
     email: user.email ?? null,
     nome: membership.nome,
     tenantId: membership.tenant_id,
-    tenantNome: (membership.tenants as unknown as { nome: string }).nome,
+    tenantNome: tenant.nome,
     role: membership.role,
+    assinaturaAtiva: tenant.assinatura_ativa,
+    trialTerminaEm: tenant.trial_termina_em,
+    trialExpirado,
+    diasRestantesTrial,
   };
 }
 

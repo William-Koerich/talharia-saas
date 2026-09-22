@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSessaoAtual } from "@/lib/auth";
 import { sair } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import { TrialExpirado } from "./trial-expirado";
 
 const LINKS_GESTOR = [
   { href: "/painel/clientes", label: "Clientes" },
@@ -29,6 +30,10 @@ export default async function PainelLayout({
     redirect("/entrar");
   }
 
+  if (sessao.trialExpirado) {
+    return <TrialExpirado tenantNome={sessao.tenantNome} />;
+  }
+
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex flex-col gap-4 border-b p-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
@@ -46,6 +51,12 @@ export default async function PainelLayout({
           </Button>
         </form>
       </header>
+      {!sessao.assinaturaAtiva && (
+        <p className="bg-muted border-b p-2 text-center text-sm print:hidden">
+          Período de teste: {sessao.diasRestantesTrial}{" "}
+          {sessao.diasRestantesTrial === 1 ? "dia restante" : "dias restantes"}.
+        </p>
+      )}
       {sessao.role !== "OPERADOR" && (
         <nav className="flex flex-wrap gap-1 border-b p-2 print:hidden">
           {LINKS_GESTOR.map((link) => (
