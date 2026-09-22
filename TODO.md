@@ -154,7 +154,23 @@ Decisão tomada nesta fase:
 
 - Tempo de parada nunca entra no custo da OS — é perda operacional rastreada separadamente (top motivos de parada no dashboard), não custo repassável.
 
-## Fase 8 — Etiquetas e entrega
+## Fase 8 — Etiquetas e entrega ✅
+
+- [x] Migration: `fardos` e `romaneios`/`romaneio_itens` (já existiam da Fase 1) endurecidos para o padrão leitura-livre/escrita-gestor; `romaneios.foto_entrega_storage_path`
+- [x] `criar_romaneio()` (RPC, `security invoker`): cria o romaneio e vincula os fardos numa transação só; testado com RLS simulando dois tenants (isolamento confirmado, inclusive tentativa de fabricar romaneio para outro tenant rejeitada)
+- [x] `src/lib/etiqueta.ts`: gera ZPL (203dpi, `^BQ` pro QR) e PDF (`pdf-lib`+`qrcode`) em dois tamanhos (4x6, 4x2); QR = `etiqueta_codigo` do fardo (`OS{numero}-F{sequencial}`)
+- [x] `/painel/os/[id]`: seção "Fardos e etiquetas" — cria fardo, baixa etiqueta (ZPL 4x6/4x2 e PDF) via `/api/fardos/[id]/etiqueta`
+- [x] `/painel/romaneios`: listagem com status (Rascunho/Conferido/Entregue)
+- [x] `/painel/romaneios/novo`: escolhe cliente, lista fardos com OS em status "pronto" e ainda não vinculados a nenhum romaneio
+- [x] `/painel/romaneios/[id]`: conferência dos fardos (manual ou por câmera/QR reaproveitando o padrão do `/apontar`), captura de foto da entrega (câmera) e assinatura (canvas), "Finalizar entrega" (upload pro bucket `arquivos`, status → entregue), download do PDF do romaneio (`/api/romaneios/[id]/pdf`)
+- [x] Nav "Romaneios" adicionado ao painel
+- [x] Validado de ponta a ponta contra o projeto remoto: criação de fardos, download de etiqueta ZPL/PDF, criação de romaneio, conferência, captura de foto+assinatura, entrega finalizada, PDF do romaneio — todos os 200/OK com dados reais
+
+Bugs corrigidos nesta fase:
+
+- `captura-entrega.tsx` (novo) e `apontar/tela-buscar-os.tsx` (Fase 5, achado ao reaproveitar o mesmo padrão): a câmera nunca funcionava de verdade. O `<video>` só era montado no DOM depois de `setEscaneando(true)`/`setCameraAtiva(true)`, mas o código tentava atribuir `srcObject` a `videoRef.current` *antes* dessa mudança de estado — ou seja, o ref sempre estava `null` nesse momento e o stream nunca era conectado ao elemento. Ninguém percebeu porque o vídeo aparecia (elemento existe após o re-render) e o loop de leitura de QR simplesmente ficava girando sem erro, sem nunca ler nada. Corrigido montando o `<video>` sempre (oculto via classe, mesmo padrão já usado no `<canvas>`), então o ref existe antes do `getUserMedia` resolver. Confirmado com diagnóstico ao vivo (câmera fake do Chrome): antes da correção `videoWidth: 0, hasSrcObject: false`; depois, `videoWidth: 640, hasSrcObject: true`. **Isso significa que a leitura de QR no tablet do talhador (`/apontar`, Fase 5 CRÍTICA) nunca funcionou em produção até este fix** — só a busca manual por número da OS funcionava.
+
+## Fase 9 — Portal do cliente
 
 - [ ] Não iniciada
 

@@ -102,23 +102,21 @@ export function TelaBuscarOS({
 
       <h1 className="text-2xl font-bold">Buscar OS</h1>
 
+      <video
+        ref={videoRef}
+        className={escaneando ? "w-full rounded border" : "hidden"}
+        playsInline
+        muted
+      />
+      <canvas ref={canvasRef} className="hidden" />
       {escaneando ? (
-        <div className="flex flex-col gap-3">
-          <video
-            ref={videoRef}
-            className="w-full rounded border"
-            playsInline
-            muted
-          />
-          <canvas ref={canvasRef} className="hidden" />
-          <Button
-            variant="outline"
-            className="h-14 text-lg"
-            onClick={pararCamera}
-          >
-            Cancelar
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          className="h-14 text-lg"
+          onClick={pararCamera}
+        >
+          Cancelar
+        </Button>
       ) : (
         <Button className="h-16 text-lg" onClick={iniciarCamera}>
           Ler QR da OS

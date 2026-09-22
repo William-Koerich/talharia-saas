@@ -17,6 +17,7 @@ import { FormularioDetalhesOS } from "./formulario-detalhes-os";
 import { FormularioRolo } from "./formulario-rolo";
 import { FormularioEnfesto } from "./formulario-enfesto";
 import { FormularioSobra } from "./formulario-sobra";
+import { FormularioFardo } from "./formulario-fardo";
 import { atualizarOS, excluirOS, adicionarRolo, removerRolo } from "../actions";
 import {
   criarEnfesto,
@@ -24,6 +25,7 @@ import {
   criarSobra,
   excluirSobra,
 } from "./enfesto-actions";
+import { criarFardo, excluirFardo } from "./fardo-actions";
 
 const ROTULO_TIPO_SOBRA: Record<string, string> = {
   retalho: "Retalho",
@@ -50,6 +52,7 @@ export default async function PaginaOSDetalhe({
     { data: sobrasData },
     { data: aproveitamento },
     { data: custos },
+    { data: fardosData },
   ] = await Promise.all([
     supabase
       .from("ordens_servico")
@@ -91,6 +94,11 @@ export default async function PaginaOSDetalhe({
       )
       .eq("os_id", id)
       .maybeSingle(),
+    supabase
+      .from("fardos")
+      .select("id, etiqueta_codigo, descricao, created_at")
+      .eq("os_id", id)
+      .order("created_at"),
   ]);
 
   if (!os) notFound();
@@ -128,6 +136,7 @@ export default async function PaginaOSDetalhe({
 
   const enfestos = enfestosData ?? [];
   const sobras = sobrasData ?? [];
+  const fardos = fardosData ?? [];
 
   return (
     <div className="flex flex-col gap-8">
@@ -354,6 +363,86 @@ export default async function PaginaOSDetalhe({
           </TableBody>
         </Table>
         <FormularioSobra enfestos={enfestos} acao={criarSobra.bind(null, id)} />
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold">Fardos e etiquetas</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Código</TableHead>
+              <TableHead>Descrição</TableHead>
+              <TableHead>Etiqueta</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {fardos.map((fardo) => (
+              <TableRow key={fardo.id}>
+                <TableCell>{fardo.etiqueta_codigo}</TableCell>
+                <TableCell>{fardo.descricao ?? "—"}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      render={
+                        <a
+                          href={`/api/fardos/${fardo.id}/etiqueta?formato=zpl&tamanho=4x6`}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      ZPL 4x6
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      render={
+                        <a
+                          href={`/api/fardos/${fardo.id}/etiqueta?formato=zpl&tamanho=4x2`}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      ZPL 4x2
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      render={
+                        <a
+                          href={`/api/fardos/${fardo.id}/etiqueta?formato=pdf&tamanho=4x6`}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      PDF
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  <form action={excluirFardo.bind(null, id, fardo.id)}>
+                    <Button variant="ghost" size="sm" type="submit">
+                      Remover
+                    </Button>
+                  </form>
+                </TableCell>
+              </TableRow>
+            ))}
+            {fardos.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="text-muted-foreground text-center"
+                >
+                  Nenhum fardo criado.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <FormularioFardo acao={criarFardo.bind(null, id)} />
       </section>
 
       {custos && (

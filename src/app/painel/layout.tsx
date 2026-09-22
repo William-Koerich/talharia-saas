@@ -8,6 +8,7 @@ const LINKS_GESTOR = [
   { href: "/painel/clientes", label: "Clientes" },
   { href: "/painel/modelos", label: "Modelos" },
   { href: "/painel/os", label: "Ordens de Serviço" },
+  { href: "/painel/romaneios", label: "Romaneios" },
   { href: "/painel/relatorios/perdas", label: "Relatório de perdas" },
   { href: "/painel/relatorios/margem", label: "Margem por cliente" },
   { href: "/painel/maquinas", label: "Máquinas" },
