@@ -79,11 +79,18 @@ export function ApontamentoApp() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="bg-muted flex items-center justify-between px-4 py-1 text-xs">
-        <span>
+      <div className="bg-secondary flex items-center justify-between px-4 py-1.5 text-xs">
+        <span className="flex items-center gap-1.5">
+          <span
+            className={`size-1.5 rounded-full ${!online ? "bg-destructive" : sincronizando ? "bg-amber-500" : "bg-emerald-500"}`}
+          />
           {!online ? "Offline" : sincronizando ? "Sincronizando…" : "Online"}
         </span>
-        {pendentes > 0 && <span>{pendentes} pendente(s)</span>}
+        {pendentes > 0 && (
+          <span className="bg-primary/15 text-primary rounded-full px-2 py-0.5 font-medium">
+            {pendentes} pendente(s)
+          </span>
+        )}
       </div>
 
       {aviso && (

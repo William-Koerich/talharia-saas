@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/page-header";
 import { QuadroKanban, type OSCard } from "./quadro-kanban";
 import type { OsStatus } from "@/lib/os-status";
 
@@ -43,13 +45,17 @@ export default async function PaginaOS({
   }));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Ordens de Serviço</h1>
-        <Button render={<Link href="/painel/os/novo" />} nativeButton={false}>
-          Nova OS
-        </Button>
-      </div>
+    <div className="flex flex-1 flex-col gap-6">
+      <PageHeader
+        title="Ordens de Serviço"
+        description="Acompanhe o fluxo de produção por status"
+        actions={
+          <Button render={<Link href="/painel/os/novo" />} nativeButton={false}>
+            <Plus className="size-4" />
+            Nova OS
+          </Button>
+        }
+      />
 
       {erro && <p className="text-destructive text-sm">{erro}</p>}
 

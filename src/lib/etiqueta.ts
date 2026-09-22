@@ -17,12 +17,16 @@ function polegadasParaPontos(pol: { largura: number; altura: number }) {
   return { largura: pol.largura * DPI, altura: pol.altura * DPI };
 }
 
-const DIMENSOES: Record<TamanhoEtiqueta, { largura: number; altura: number }> = {
-  "4x6": polegadasParaPontos({ largura: 4, altura: 6 }),
-  "4x2": polegadasParaPontos({ largura: 4, altura: 2 }),
-};
+const DIMENSOES: Record<TamanhoEtiqueta, { largura: number; altura: number }> =
+  {
+    "4x6": polegadasParaPontos({ largura: 4, altura: 6 }),
+    "4x2": polegadasParaPontos({ largura: 4, altura: 2 }),
+  };
 
-export function gerarZpl(dados: DadosEtiqueta, tamanho: TamanhoEtiqueta): string {
+export function gerarZpl(
+  dados: DadosEtiqueta,
+  tamanho: TamanhoEtiqueta,
+): string {
   const { largura, altura } = DIMENSOES[tamanho];
   const linhas = [
     `OS #${dados.osNumero}`,
@@ -32,7 +36,9 @@ export function gerarZpl(dados: DadosEtiqueta, tamanho: TamanhoEtiqueta): string
   ].filter(Boolean);
 
   const linhasZpl = linhas
-    .map((texto, i) => `^FO260,${50 + i * 40}^A0N,30,30^FD${escaparZpl(texto)}^FS`)
+    .map(
+      (texto, i) => `^FO260,${50 + i * 40}^A0N,30,30^FD${escaparZpl(texto)}^FS`,
+    )
     .join("\n");
 
   return [
@@ -55,15 +61,19 @@ export async function gerarPdfEtiqueta(
   dados: DadosEtiqueta,
   tamanho: TamanhoEtiqueta,
 ): Promise<Uint8Array> {
-  const { largura, altura } = { "4x6": { largura: 288, altura: 432 }, "4x2": { largura: 288, altura: 144 } }[
-    tamanho
-  ];
+  const { largura, altura } = {
+    "4x6": { largura: 288, altura: 432 },
+    "4x2": { largura: 288, altura: 144 },
+  }[tamanho];
 
   const pdfDoc = await PDFDocument.create();
   const pagina = pdfDoc.addPage([largura, altura]);
   const fonte = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  const qrDataUrl = await QRCode.toDataURL(dados.etiquetaCodigo, { margin: 1, width: 300 });
+  const qrDataUrl = await QRCode.toDataURL(dados.etiquetaCodigo, {
+    margin: 1,
+    width: 300,
+  });
   const qrImagemBytes = Buffer.from(qrDataUrl.split(",")[1], "base64");
   const qrImagem = await pdfDoc.embedPng(qrImagemBytes);
   const qrTamanho = Math.min(largura * 0.4, altura * 0.7);
@@ -85,7 +95,13 @@ export async function gerarPdfEtiqueta(
   let y = altura - 20;
   const xTexto = qrTamanho + 24;
   for (const linha of linhas) {
-    pagina.drawText(linha, { x: xTexto, y, size: 10, font: fonte, color: rgb(0, 0, 0) });
+    pagina.drawText(linha, {
+      x: xTexto,
+      y,
+      size: 10,
+      font: fonte,
+      color: rgb(0, 0, 0),
+    });
     y -= 14;
   }
 

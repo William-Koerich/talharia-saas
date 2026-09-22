@@ -25,7 +25,8 @@ export async function GET(
       .eq("romaneio_id", id),
   ]);
 
-  if (!romaneio) return new NextResponse("Romaneio não encontrado", { status: 404 });
+  if (!romaneio)
+    return new NextResponse("Romaneio não encontrado", { status: 404 });
 
   const cliente = romaneio.clientes as unknown as { nome: string } | null;
   const itens = (itensData ?? []).map((item) => {

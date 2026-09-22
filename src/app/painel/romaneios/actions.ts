@@ -25,7 +25,8 @@ export async function criarRomaneio(
     p_fardo_ids: fardoIds,
   });
 
-  if (error || !romaneioId) return { erro: "Não foi possível criar o romaneio." };
+  if (error || !romaneioId)
+    return { erro: "Não foi possível criar o romaneio." };
 
   revalidatePath("/painel/romaneios");
   redirect(`/painel/romaneios/${romaneioId}`);
@@ -55,7 +56,10 @@ export async function alternarConferidoItem(
   const supabase = await createClient();
   await supabase
     .from("romaneio_itens")
-    .update({ conferido, conferido_em: conferido ? new Date().toISOString() : null })
+    .update({
+      conferido,
+      conferido_em: conferido ? new Date().toISOString() : null,
+    })
     .eq("id", itemId);
   revalidatePath(`/painel/romaneios/${romaneioId}`);
 }
@@ -76,7 +80,10 @@ export async function marcarRomaneioConferido(romaneioId: string) {
 
   if (!total || conferidos !== total) return;
 
-  await supabase.from("romaneios").update({ status: "conferido" }).eq("id", romaneioId);
+  await supabase
+    .from("romaneios")
+    .update({ status: "conferido" })
+    .eq("id", romaneioId);
   revalidatePath(`/painel/romaneios/${romaneioId}`);
 }
 

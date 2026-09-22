@@ -31,7 +31,9 @@ export async function getSessaoAtual(): Promise<SessaoAtual | null> {
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("tenant_id, role, nome, tenants(nome, assinatura_ativa, trial_termina_em)")
+    .select(
+      "tenant_id, role, nome, tenants(nome, assinatura_ativa, trial_termina_em)",
+    )
     .eq("user_id", user.id)
     .limit(1)
     .maybeSingle();
@@ -45,7 +47,8 @@ export async function getSessaoAtual(): Promise<SessaoAtual | null> {
   };
 
   const trialTerminaEm = new Date(tenant.trial_termina_em);
-  const trialExpirado = !tenant.assinatura_ativa && new Date() >= trialTerminaEm;
+  const trialExpirado =
+    !tenant.assinatura_ativa && new Date() >= trialTerminaEm;
   const diasRestantesTrial = Math.max(
     0,
     Math.ceil((trialTerminaEm.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),

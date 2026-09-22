@@ -1,6 +1,10 @@
+import { TrendingDown } from "lucide-react";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
+import { StatCard } from "@/components/stat-card";
 import {
   Table,
   TableBody,
@@ -79,60 +83,64 @@ function TabelaGrupo({
   media: number | null;
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <h2 className="text-lg font-semibold">{titulo}</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>OS</TableHead>
-            <TableHead>Teórico</TableHead>
-            <TableHead>Real</TableHead>
-            <TableHead>Perda</TableHead>
-            <TableHead>vs. média</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {grupos.map((g) => (
-            <TableRow key={g.nome}>
-              <TableCell>{g.nome}</TableCell>
-              <TableCell>{g.qtdOS}</TableCell>
-              <TableCell>{g.teorico.toFixed(2)} m</TableCell>
-              <TableCell>{g.real.toFixed(2)} m</TableCell>
-              <TableCell>
-                {g.perdaMetros.toFixed(2)} m
-                {g.perdaPercentual != null &&
-                  ` (${g.perdaPercentual.toFixed(1)}%)`}
-              </TableCell>
-              <TableCell>
-                {g.perdaPercentual != null && media != null ? (
-                  <Badge
-                    variant={
-                      g.perdaPercentual > media ? "destructive" : "default"
-                    }
-                  >
-                    {g.perdaPercentual > media ? "+" : ""}
-                    {(g.perdaPercentual - media).toFixed(1)}pp
-                  </Badge>
-                ) : (
-                  "—"
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-          {grupos.length === 0 && (
+    <Card>
+      <CardHeader>
+        <CardTitle>{titulo}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell
-                colSpan={6}
-                className="text-muted-foreground text-center"
-              >
-                Nenhum dado no período.
-              </TableCell>
+              <TableHead>Nome</TableHead>
+              <TableHead>OS</TableHead>
+              <TableHead>Teórico</TableHead>
+              <TableHead>Real</TableHead>
+              <TableHead>Perda</TableHead>
+              <TableHead>vs. média</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {grupos.map((g) => (
+              <TableRow key={g.nome}>
+                <TableCell>{g.nome}</TableCell>
+                <TableCell>{g.qtdOS}</TableCell>
+                <TableCell>{g.teorico.toFixed(2)} m</TableCell>
+                <TableCell>{g.real.toFixed(2)} m</TableCell>
+                <TableCell>
+                  {g.perdaMetros.toFixed(2)} m
+                  {g.perdaPercentual != null &&
+                    ` (${g.perdaPercentual.toFixed(1)}%)`}
+                </TableCell>
+                <TableCell>
+                  {g.perdaPercentual != null && media != null ? (
+                    <Badge
+                      variant={
+                        g.perdaPercentual > media ? "destructive" : "default"
+                      }
+                    >
+                      {g.perdaPercentual > media ? "+" : ""}
+                      {(g.perdaPercentual - media).toFixed(1)}pp
+                    </Badge>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+            {grupos.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-muted-foreground text-center"
+                >
+                  Nenhum dado no período.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -188,16 +196,23 @@ export default async function PaginaRelatorioPerdas({
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-xl font-semibold">Relatório de perda de tecido</h1>
+      <PageHeader title="Relatório de perda de tecido" />
 
-      <FormularioFiltros clientes={clientes ?? []} modelos={modelos ?? []} />
+      <Card>
+        <CardContent>
+          <FormularioFiltros
+            clientes={clientes ?? []}
+            modelos={modelos ?? []}
+          />
+        </CardContent>
+      </Card>
 
       {mediaGeral != null && (
-        <p className="text-muted-foreground text-sm">
-          Média geral de perda no período:{" "}
-          <strong>{mediaGeral.toFixed(1)}%</strong> ({linhas.length} OS com
-          enfesto registrado)
-        </p>
+        <StatCard
+          label={`Média geral de perda (${linhas.length} OS com enfesto)`}
+          value={`${mediaGeral.toFixed(1)}%`}
+          icon={TrendingDown}
+        />
       )}
 
       <TabelaGrupo titulo="Por modelo" grupos={porModelo} media={mediaGeral} />

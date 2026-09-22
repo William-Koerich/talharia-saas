@@ -1,5 +1,7 @@
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { SeletorCliente } from "./seletor-cliente";
 import { FormularioRomaneio } from "./formulario-romaneio";
 import { criarRomaneio } from "../actions";
@@ -51,12 +53,23 @@ export default async function PaginaNovoRomaneio({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Novo romaneio</h1>
-      <SeletorCliente clientes={clientes ?? []} clienteId={clienteId ?? ""} />
-      {clienteId && (
-        <FormularioRomaneio clienteId={clienteId} fardos={fardos} acao={criarRomaneio} />
-      )}
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Novo romaneio" />
+      <Card className="max-w-lg">
+        <CardContent className="flex flex-col gap-4">
+          <SeletorCliente
+            clientes={clientes ?? []}
+            clienteId={clienteId ?? ""}
+          />
+          {clienteId && (
+            <FormularioRomaneio
+              clienteId={clienteId}
+              fardos={fardos}
+              acao={criarRomaneio}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

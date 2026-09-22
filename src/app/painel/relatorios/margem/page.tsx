@@ -1,6 +1,8 @@
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import {
   Table,
   TableBody,
@@ -109,55 +111,65 @@ export default async function PaginaRelatorioMargem({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Margem por cliente</h1>
+      <PageHeader title="Margem por cliente" />
 
-      <FormularioFiltrosMargem clientes={clientes ?? []} />
+      <Card>
+        <CardContent>
+          <FormularioFiltrosMargem clientes={clientes ?? []} />
+        </CardContent>
+      </Card>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Cliente</TableHead>
-            <TableHead>OS</TableHead>
-            <TableHead>Preço acordado</TableHead>
-            <TableHead>Custo</TableHead>
-            <TableHead>Margem</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {linhas.map((g) => (
-            <TableRow key={g.nome}>
-              <TableCell>
-                {g.nome}
-                {g.margem < 0 && (
-                  <Badge variant="destructive" className="ml-2">
-                    Deficitário
-                  </Badge>
-                )}
-              </TableCell>
-              <TableCell>{g.qtdOS}</TableCell>
-              <TableCell>{formatarReais(g.preco)}</TableCell>
-              <TableCell>{formatarReais(g.custo)}</TableCell>
-              <TableCell
-                className={g.margem < 0 ? "text-destructive font-medium" : ""}
-              >
-                {formatarReais(g.margem)}
-                {g.margemPercentual != null &&
-                  ` (${g.margemPercentual.toFixed(1)}%)`}
-              </TableCell>
-            </TableRow>
-          ))}
-          {linhas.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-muted-foreground text-center"
-              >
-                Nenhuma OS com preço acordado no período.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Cliente</TableHead>
+                <TableHead>OS</TableHead>
+                <TableHead>Preço acordado</TableHead>
+                <TableHead>Custo</TableHead>
+                <TableHead>Margem</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {linhas.map((g) => (
+                <TableRow key={g.nome}>
+                  <TableCell>
+                    {g.nome}
+                    {g.margem < 0 && (
+                      <Badge variant="destructive" className="ml-2">
+                        Deficitário
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>{g.qtdOS}</TableCell>
+                  <TableCell>{formatarReais(g.preco)}</TableCell>
+                  <TableCell>{formatarReais(g.custo)}</TableCell>
+                  <TableCell
+                    className={
+                      g.margem < 0 ? "text-destructive font-medium" : ""
+                    }
+                  >
+                    {formatarReais(g.margem)}
+                    {g.margemPercentual != null &&
+                      ` (${g.margemPercentual.toFixed(1)}%)`}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {linhas.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhuma OS com preço acordado no período.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

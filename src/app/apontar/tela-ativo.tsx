@@ -137,7 +137,7 @@ export function TelaAtiva({
             <Button
               key={motivo.id}
               variant="outline"
-              className="h-16 justify-start text-lg capitalize"
+              className="h-16 justify-start rounded-2xl text-lg capitalize"
               disabled={enviando}
               onClick={() => pausar(motivo.id)}
             >
@@ -161,7 +161,7 @@ export function TelaAtiva({
           <Input
             type="number"
             inputMode="numeric"
-            className="h-14 text-lg"
+            className="h-14 rounded-xl text-lg"
             value={qtdProduzida}
             onChange={(e) => setQtdProduzida(e.target.value)}
             required
@@ -172,7 +172,7 @@ export function TelaAtiva({
           <Input
             type="number"
             step="0.01"
-            className="h-14 text-lg"
+            className="h-14 rounded-xl text-lg"
             value={sobraMetros}
             onChange={(e) => setSobraMetros(e.target.value)}
           />
@@ -184,7 +184,7 @@ export function TelaAtiva({
               value={sobraTipo}
               onValueChange={(v) => setSobraTipo(v ?? "")}
             >
-              <SelectTrigger className="h-14 w-full text-lg">
+              <SelectTrigger className="h-14 w-full rounded-xl text-lg">
                 <SelectValue>
                   {(valor: string | null) =>
                     TIPOS_SOBRA.find((t) => t.value === valor)?.label ??
@@ -203,7 +203,7 @@ export function TelaAtiva({
           </div>
         )}
         <Button
-          className="h-16 text-xl"
+          className="h-16 rounded-2xl text-xl"
           disabled={!qtdProduzida || enviando}
           onClick={finalizar}
         >
@@ -218,34 +218,47 @@ export function TelaAtiva({
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
-      <div>
+      <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">OS #{ativo.osNumero}</h1>
         <p className="text-muted-foreground">
           {ativo.maquinaNome} · {ativo.operacaoNome}
         </p>
-        <p className="mt-2 text-lg font-medium">
+        <span
+          className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
+            ativo.faseAtual === "parada"
+              ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+              : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+          }`}
+        >
+          <span
+            className={`size-2 rounded-full ${ativo.faseAtual === "parada" ? "bg-amber-500" : "bg-emerald-500"}`}
+          />
           {ativo.faseAtual === "parada" ? "Em parada" : "Em produção"}
-        </p>
+        </span>
       </div>
 
       {ativo.faseAtual === "produtivo" ? (
         <Button
           variant="outline"
-          className="h-16 text-xl"
+          className="h-16 rounded-2xl text-xl"
           disabled={enviando}
           onClick={() => setVista("motivo")}
         >
           PAUSAR
         </Button>
       ) : (
-        <Button className="h-16 text-xl" disabled={enviando} onClick={retomar}>
+        <Button
+          className="h-16 rounded-2xl text-xl"
+          disabled={enviando}
+          onClick={retomar}
+        >
           RETOMAR
         </Button>
       )}
 
       <Button
         variant="destructive"
-        className="h-16 text-xl"
+        className="h-16 rounded-2xl text-xl"
         disabled={enviando}
         onClick={() => setVista("finalizar")}
       >

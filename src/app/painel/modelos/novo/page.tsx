@@ -1,5 +1,7 @@
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { FormularioModelo } from "../formulario-modelo";
 import { criarModelo } from "../actions";
 
@@ -14,12 +16,16 @@ export default async function PaginaNovoModelo() {
     .order("nome");
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Novo modelo</h1>
-      <p className="text-muted-foreground max-w-md text-sm">
-        A Versão 1 é criada automaticamente como vigente.
-      </p>
-      <FormularioModelo clientes={clientes ?? []} acao={criarModelo} />
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Novo modelo"
+        description="A Versão 1 é criada automaticamente como vigente."
+      />
+      <Card className="max-w-lg">
+        <CardContent>
+          <FormularioModelo clientes={clientes ?? []} acao={criarModelo} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import {
   Table,
   TableBody,
@@ -24,59 +27,67 @@ export default async function PaginaModelos({
     .order("nome");
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Modelos</h1>
-        <Button
-          render={<Link href="/painel/modelos/novo" />}
-          nativeButton={false}
-        >
-          Novo modelo
-        </Button>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Modelos"
+        description="Biblioteca de modelos e suas versões"
+        actions={
+          <Button
+            render={<Link href="/painel/modelos/novo" />}
+            nativeButton={false}
+          >
+            <Plus className="size-4" />
+            Novo modelo
+          </Button>
+        }
+      />
 
       {erro && <p className="text-destructive text-sm">{erro}</p>}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Cliente</TableHead>
-            <TableHead className="text-right">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {modelos?.map((modelo) => (
-            <TableRow key={modelo.id}>
-              <TableCell>{modelo.nome}</TableCell>
-              <TableCell>
-                {(modelo.clientes as unknown as { nome: string } | null)
-                  ?.nome ?? "—"}
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  render={<Link href={`/painel/modelos/${modelo.id}`} />}
-                  nativeButton={false}
-                >
-                  Abrir
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {modelos?.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={3}
-                className="text-muted-foreground text-center"
-              >
-                Nenhum modelo cadastrado.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {modelos?.map((modelo) => (
+                <TableRow key={modelo.id}>
+                  <TableCell>{modelo.nome}</TableCell>
+                  <TableCell>
+                    {(modelo.clientes as unknown as { nome: string } | null)
+                      ?.nome ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      render={<Link href={`/painel/modelos/${modelo.id}`} />}
+                      nativeButton={false}
+                    >
+                      Abrir
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {modelos?.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhum modelo cadastrado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

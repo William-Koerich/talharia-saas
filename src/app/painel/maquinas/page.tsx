@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import {
   Table,
   TableBody,
@@ -30,80 +33,88 @@ export default async function PaginaMaquinas({
     TIPOS_MAQUINA.find((t) => t.value === tipo)?.label ?? tipo;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Máquinas</h1>
-        <Button
-          render={<Link href="/painel/maquinas/novo" />}
-          nativeButton={false}
-        >
-          Nova máquina
-        </Button>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Máquinas"
+        description="Parque de máquinas usado no apontamento e nos custos"
+        actions={
+          <Button
+            render={<Link href="/painel/maquinas/novo" />}
+            nativeButton={false}
+          >
+            <Plus className="size-4" />
+            Nova máquina
+          </Button>
+        }
+      />
 
       {erro && <p className="text-destructive text-sm">{erro}</p>}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Custo/hora</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {maquinas?.map((maquina) => (
-            <TableRow key={maquina.id}>
-              <TableCell>{maquina.nome}</TableCell>
-              <TableCell>{rotuloTipo(maquina.tipo)}</TableCell>
-              <TableCell>
-                {maquina.custo_hora.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </TableCell>
-              <TableCell>
-                <Badge variant={maquina.ativo ? "default" : "secondary"}>
-                  {maquina.ativo ? "Ativa" : "Inativa"}
-                </Badge>
-              </TableCell>
-              <TableCell className="flex justify-end gap-2 text-right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  render={<Link href={`/painel/maquinas/${maquina.id}`} />}
-                  nativeButton={false}
-                >
-                  Editar
-                </Button>
-                <form
-                  action={alternarAtivoMaquina.bind(
-                    null,
-                    maquina.id,
-                    !maquina.ativo,
-                  )}
-                >
-                  <Button variant="ghost" size="sm" type="submit">
-                    {maquina.ativo ? "Desativar" : "Ativar"}
-                  </Button>
-                </form>
-              </TableCell>
-            </TableRow>
-          ))}
-          {maquinas?.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-muted-foreground text-center"
-              >
-                Nenhuma máquina cadastrada.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Custo/hora</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {maquinas?.map((maquina) => (
+                <TableRow key={maquina.id}>
+                  <TableCell>{maquina.nome}</TableCell>
+                  <TableCell>{rotuloTipo(maquina.tipo)}</TableCell>
+                  <TableCell>
+                    {maquina.custo_hora.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={maquina.ativo ? "default" : "secondary"}>
+                      {maquina.ativo ? "Ativa" : "Inativa"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="flex justify-end gap-2 text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      render={<Link href={`/painel/maquinas/${maquina.id}`} />}
+                      nativeButton={false}
+                    >
+                      Editar
+                    </Button>
+                    <form
+                      action={alternarAtivoMaquina.bind(
+                        null,
+                        maquina.id,
+                        !maquina.ativo,
+                      )}
+                    >
+                      <Button variant="ghost" size="sm" type="submit">
+                        {maquina.ativo ? "Desativar" : "Ativar"}
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {maquinas?.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhuma máquina cadastrada.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

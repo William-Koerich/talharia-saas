@@ -24,7 +24,9 @@ export function SeletorCliente({
       <Label htmlFor="cliente_id">Cliente</Label>
       <Select
         value={clienteId}
-        onValueChange={(valor) => router.push(`/painel/romaneios/novo?cliente_id=${valor}`)}
+        onValueChange={(valor) =>
+          router.push(`/painel/romaneios/novo?cliente_id=${valor}`)
+        }
       >
         <SelectTrigger id="cliente_id">
           <SelectValue>

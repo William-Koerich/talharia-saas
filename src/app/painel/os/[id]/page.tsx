@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Printer } from "lucide-react";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { SeletorStatus } from "./seletor-status";
 import { FormularioDetalhesOS } from "./formulario-detalhes-os";
 import { FormularioRolo } from "./formulario-rolo";
@@ -140,22 +143,20 @@ export default async function PaginaOSDetalhe({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">OS #{os.numero}</h1>
-          <p className="text-muted-foreground text-sm">
-            {cliente?.nome ?? "—"} · {versao?.modelos?.nome ?? "—"} (v
-            {versao?.versao})
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          render={<Link href={`/painel/os/${id}/ficha`} />}
-          nativeButton={false}
-        >
-          Ficha para impressão
-        </Button>
-      </div>
+      <PageHeader
+        title={`OS #${os.numero}`}
+        description={`${cliente?.nome ?? "—"} · ${versao?.modelos?.nome ?? "—"} (v${versao?.versao})`}
+        actions={
+          <Button
+            variant="outline"
+            render={<Link href={`/painel/os/${id}/ficha`} />}
+            nativeButton={false}
+          >
+            <Printer className="size-4" />
+            Ficha para impressão
+          </Button>
+        }
+      />
 
       {versao && !versao.vigente && (
         <p className="text-destructive text-sm">
@@ -163,323 +164,362 @@ export default async function PaginaOSDetalhe({
         </p>
       )}
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">Status</h2>
-        <SeletorStatus osId={id} status={os.status} />
-      </section>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SeletorStatus osId={id} status={os.status} />
+          </CardContent>
+        </Card>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">Detalhes</h2>
-        <FormularioDetalhesOS
-          prazo={os.prazo}
-          precoAcordado={os.preco_acordado}
-          acao={atualizarOS.bind(null, id)}
-        />
-      </section>
+        <Card>
+          <CardHeader>
+            <CardTitle>Detalhes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FormularioDetalhesOS
+              prazo={os.prazo}
+              precoAcordado={os.preco_acordado}
+              acao={atualizarOS.bind(null, id)}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">Grade</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Tamanho</TableHead>
-              <TableHead>Cor</TableHead>
-              <TableHead>Quantidade</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {grade?.map((item, i) => (
-              <TableRow key={i}>
-                <TableCell>{item.tamanho}</TableCell>
-                <TableCell>{item.cor}</TableCell>
-                <TableCell>{item.quantidade}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Rolos vinculados</h2>
-        {partidasDistintas.size > 1 && (
-          <p className="text-destructive text-sm">
-            Atenção: os rolos vinculados a esta OS têm partidas diferentes (
-            {Array.from(partidasDistintas).join(", ")}) — pode gerar variação de
-            cor no mesmo enfesto.
-          </p>
-        )}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Origem</TableHead>
-              <TableHead>Partida</TableHead>
-              <TableHead>Cor</TableHead>
-              <TableHead>Metros consumidos</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rolos.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.rolo?.origem}</TableCell>
-                <TableCell>{item.rolo?.partida ?? "—"}</TableCell>
-                <TableCell>{item.rolo?.cor ?? "—"}</TableCell>
-                <TableCell>{item.metrosConsumidos}</TableCell>
-                <TableCell className="text-right">
-                  <form action={removerRolo.bind(null, id, item.id)}>
-                    <Button variant="ghost" size="sm" type="submit">
-                      Remover
-                    </Button>
-                  </form>
-                </TableCell>
-              </TableRow>
-            ))}
-            {rolos.length === 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Grade</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-muted-foreground text-center"
-                >
-                  Nenhum rolo vinculado.
-                </TableCell>
+                <TableHead>Tamanho</TableHead>
+                <TableHead>Cor</TableHead>
+                <TableHead>Quantidade</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <FormularioRolo acao={adicionarRolo.bind(null, id)} />
-      </section>
+            </TableHeader>
+            <TableBody>
+              {grade?.map((item, i) => (
+                <TableRow key={i}>
+                  <TableCell>{item.tamanho}</TableCell>
+                  <TableCell>{item.cor}</TableCell>
+                  <TableCell>{item.quantidade}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Enfestos</h2>
-        {aproveitamento && (
-          <div className="bg-muted flex flex-wrap gap-4 rounded p-3 text-sm">
-            <span>
-              Teórico: {Number(aproveitamento.consumo_teorico).toFixed(2)} m
-            </span>
-            <span>
-              Real: {Number(aproveitamento.consumo_real).toFixed(2)} m
-            </span>
-            <span>
-              Perda: {Number(aproveitamento.perda_metros).toFixed(2)} m
-            </span>
-            <span>
-              {aproveitamento.perda_percentual != null
-                ? `${aproveitamento.perda_percentual}% de perda sobre o real`
-                : "Sem enfesto registrado ainda"}
-            </span>
-          </div>
-        )}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Folhas</TableHead>
-              <TableHead>Comprimento</TableHead>
-              <TableHead>Consumo (folhas × comprimento)</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {enfestos.map((enfesto) => (
-              <TableRow key={enfesto.id}>
-                <TableCell>{enfesto.folhas}</TableCell>
-                <TableCell>{enfesto.comprimento} m</TableCell>
-                <TableCell>
-                  {(enfesto.folhas * enfesto.comprimento).toFixed(2)} m
-                </TableCell>
-                <TableCell className="text-right">
-                  <form action={excluirEnfesto.bind(null, id, enfesto.id)}>
-                    <Button variant="ghost" size="sm" type="submit">
-                      Remover
-                    </Button>
-                  </form>
-                </TableCell>
-              </TableRow>
-            ))}
-            {enfestos.length === 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Rolos vinculados</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          {partidasDistintas.size > 1 && (
+            <p className="text-destructive text-sm">
+              Atenção: os rolos vinculados a esta OS têm partidas diferentes (
+              {Array.from(partidasDistintas).join(", ")}) — pode gerar variação
+              de cor no mesmo enfesto.
+            </p>
+          )}
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-muted-foreground text-center"
-                >
-                  Nenhum enfesto registrado.
-                </TableCell>
+                <TableHead>Origem</TableHead>
+                <TableHead>Partida</TableHead>
+                <TableHead>Cor</TableHead>
+                <TableHead>Metros consumidos</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <FormularioEnfesto
-          rolosDaOS={rolosDaOS}
-          acao={criarEnfesto.bind(null, id)}
-        />
-      </section>
+            </TableHeader>
+            <TableBody>
+              {rolos.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.rolo?.origem}</TableCell>
+                  <TableCell>{item.rolo?.partida ?? "—"}</TableCell>
+                  <TableCell>{item.rolo?.cor ?? "—"}</TableCell>
+                  <TableCell>{item.metrosConsumidos}</TableCell>
+                  <TableCell className="text-right">
+                    <form action={removerRolo.bind(null, id, item.id)}>
+                      <Button variant="ghost" size="sm" type="submit">
+                        Remover
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {rolos.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhum rolo vinculado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <FormularioRolo acao={adicionarRolo.bind(null, id)} />
+        </CardContent>
+      </Card>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Sobras</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Metros</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sobras.map((sobra) => (
-              <TableRow key={sobra.id}>
-                <TableCell>
-                  <Badge variant="secondary">
-                    {ROTULO_TIPO_SOBRA[sobra.tipo] ?? sobra.tipo}
-                  </Badge>
-                </TableCell>
-                <TableCell>{sobra.metros} m</TableCell>
-                <TableCell>
-                  {sobra.valor != null
-                    ? Number(sobra.valor).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })
-                    : "—"}
-                </TableCell>
-                <TableCell className="text-right">
-                  <form action={excluirSobra.bind(null, id, sobra.id)}>
-                    <Button variant="ghost" size="sm" type="submit">
-                      Remover
-                    </Button>
-                  </form>
-                </TableCell>
-              </TableRow>
-            ))}
-            {sobras.length === 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Enfestos</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          {aproveitamento && (
+            <div className="bg-secondary/60 flex flex-wrap gap-x-6 gap-y-1 rounded-lg p-3 text-sm">
+              <span>
+                Teórico: {Number(aproveitamento.consumo_teorico).toFixed(2)} m
+              </span>
+              <span>
+                Real: {Number(aproveitamento.consumo_real).toFixed(2)} m
+              </span>
+              <span>
+                Perda: {Number(aproveitamento.perda_metros).toFixed(2)} m
+              </span>
+              <span>
+                {aproveitamento.perda_percentual != null
+                  ? `${aproveitamento.perda_percentual}% de perda sobre o real`
+                  : "Sem enfesto registrado ainda"}
+              </span>
+            </div>
+          )}
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-muted-foreground text-center"
-                >
-                  Nenhuma sobra registrada.
-                </TableCell>
+                <TableHead>Folhas</TableHead>
+                <TableHead>Comprimento</TableHead>
+                <TableHead>Consumo (folhas × comprimento)</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <FormularioSobra enfestos={enfestos} acao={criarSobra.bind(null, id)} />
-      </section>
+            </TableHeader>
+            <TableBody>
+              {enfestos.map((enfesto) => (
+                <TableRow key={enfesto.id}>
+                  <TableCell>{enfesto.folhas}</TableCell>
+                  <TableCell>{enfesto.comprimento} m</TableCell>
+                  <TableCell>
+                    {(enfesto.folhas * enfesto.comprimento).toFixed(2)} m
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <form action={excluirEnfesto.bind(null, id, enfesto.id)}>
+                      <Button variant="ghost" size="sm" type="submit">
+                        Remover
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {enfestos.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhum enfesto registrado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <FormularioEnfesto
+            rolosDaOS={rolosDaOS}
+            acao={criarEnfesto.bind(null, id)}
+          />
+        </CardContent>
+      </Card>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Fardos e etiquetas</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Etiqueta</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {fardos.map((fardo) => (
-              <TableRow key={fardo.id}>
-                <TableCell>{fardo.etiqueta_codigo}</TableCell>
-                <TableCell>{fardo.descricao ?? "—"}</TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      render={
-                        <a
-                          href={`/api/fardos/${fardo.id}/etiqueta?formato=zpl&tamanho=4x6`}
-                        />
-                      }
-                      nativeButton={false}
-                    >
-                      ZPL 4x6
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      render={
-                        <a
-                          href={`/api/fardos/${fardo.id}/etiqueta?formato=zpl&tamanho=4x2`}
-                        />
-                      }
-                      nativeButton={false}
-                    >
-                      ZPL 4x2
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      render={
-                        <a
-                          href={`/api/fardos/${fardo.id}/etiqueta?formato=pdf&tamanho=4x6`}
-                        />
-                      }
-                      nativeButton={false}
-                    >
-                      PDF
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <form action={excluirFardo.bind(null, id, fardo.id)}>
-                    <Button variant="ghost" size="sm" type="submit">
-                      Remover
-                    </Button>
-                  </form>
-                </TableCell>
-              </TableRow>
-            ))}
-            {fardos.length === 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Sobras</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-muted-foreground text-center"
-                >
-                  Nenhum fardo criado.
-                </TableCell>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Metros</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <FormularioFardo acao={criarFardo.bind(null, id)} />
-      </section>
+            </TableHeader>
+            <TableBody>
+              {sobras.map((sobra) => (
+                <TableRow key={sobra.id}>
+                  <TableCell>
+                    <Badge variant="secondary">
+                      {ROTULO_TIPO_SOBRA[sobra.tipo] ?? sobra.tipo}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{sobra.metros} m</TableCell>
+                  <TableCell>
+                    {sobra.valor != null
+                      ? Number(sobra.valor).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <form action={excluirSobra.bind(null, id, sobra.id)}>
+                      <Button variant="ghost" size="sm" type="submit">
+                        Remover
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {sobras.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhuma sobra registrada.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <FormularioSobra
+            enfestos={enfestos}
+            acao={criarSobra.bind(null, id)}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Fardos e etiquetas</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Código</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Etiqueta</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {fardos.map((fardo) => (
+                <TableRow key={fardo.id}>
+                  <TableCell>{fardo.etiqueta_codigo}</TableCell>
+                  <TableCell>{fardo.descricao ?? "—"}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        render={
+                          <a
+                            href={`/api/fardos/${fardo.id}/etiqueta?formato=zpl&tamanho=4x6`}
+                          />
+                        }
+                        nativeButton={false}
+                      >
+                        ZPL 4x6
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        render={
+                          <a
+                            href={`/api/fardos/${fardo.id}/etiqueta?formato=zpl&tamanho=4x2`}
+                          />
+                        }
+                        nativeButton={false}
+                      >
+                        ZPL 4x2
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        render={
+                          <a
+                            href={`/api/fardos/${fardo.id}/etiqueta?formato=pdf&tamanho=4x6`}
+                          />
+                        }
+                        nativeButton={false}
+                      >
+                        PDF
+                      </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <form action={excluirFardo.bind(null, id, fardo.id)}>
+                      <Button variant="ghost" size="sm" type="submit">
+                        Remover
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {fardos.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhum fardo criado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <FormularioFardo acao={criarFardo.bind(null, id)} />
+        </CardContent>
+      </Card>
 
       {custos && (
-        <section className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold">Custos e margem</h2>
-          <div className="bg-muted flex flex-wrap gap-4 rounded p-3 text-sm">
-            <span>Máquina: {formatarReais(Number(custos.custo_maquina))}</span>
-            <span>
-              Mão de obra: {formatarReais(Number(custos.custo_mao_de_obra))}
-            </span>
-            <span>
-              Consumíveis: {formatarReais(Number(custos.custo_consumiveis))}
-            </span>
-            <span>
-              Tecido próprio:{" "}
-              {formatarReais(Number(custos.custo_tecido_proprio))}
-            </span>
-            <span className="font-medium">
-              Custo total: {formatarReais(Number(custos.custo_total))}
-            </span>
-          </div>
-          <p className="text-sm">
-            Margem:{" "}
-            <span
-              className={
-                Number(custos.margem) < 0
-                  ? "text-destructive font-medium"
-                  : "font-medium"
-              }
-            >
-              {formatarReais(Number(custos.margem))}
-              {custos.margem_percentual != null &&
-                ` (${custos.margem_percentual}%)`}
-            </span>
-            {Number(custos.margem) < 0 && " — esta OS está deficitária"}
-          </p>
-        </section>
+        <Card>
+          <CardHeader>
+            <CardTitle>Custos e margem</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <div className="bg-secondary/60 flex flex-wrap gap-x-6 gap-y-1 rounded-lg p-3 text-sm">
+              <span>
+                Máquina: {formatarReais(Number(custos.custo_maquina))}
+              </span>
+              <span>
+                Mão de obra: {formatarReais(Number(custos.custo_mao_de_obra))}
+              </span>
+              <span>
+                Consumíveis: {formatarReais(Number(custos.custo_consumiveis))}
+              </span>
+              <span>
+                Tecido próprio:{" "}
+                {formatarReais(Number(custos.custo_tecido_proprio))}
+              </span>
+              <span className="font-medium">
+                Custo total: {formatarReais(Number(custos.custo_total))}
+              </span>
+            </div>
+            <p className="text-sm">
+              Margem:{" "}
+              <span
+                className={
+                  Number(custos.margem) < 0
+                    ? "text-destructive font-medium"
+                    : "font-medium"
+                }
+              >
+                {formatarReais(Number(custos.margem))}
+                {custos.margem_percentual != null &&
+                  ` (${custos.margem_percentual}%)`}
+              </span>
+              {Number(custos.margem) < 0 && " — esta OS está deficitária"}
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       <form action={excluirOS.bind(null, id)}>

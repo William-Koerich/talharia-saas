@@ -98,12 +98,22 @@ export function ConferenciaQr({
             muted
           />
           <canvas ref={canvasRef} className="hidden" />
-          <Button variant="outline" size="sm" onClick={pararCamera} className="w-fit">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={pararCamera}
+            className="w-fit"
+          >
             Parar câmera
           </Button>
         </div>
       ) : (
-        <Button variant="outline" size="sm" onClick={iniciarCamera} className="w-fit">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={iniciarCamera}
+          className="w-fit"
+        >
           Conferir por QR code
         </Button>
       )}

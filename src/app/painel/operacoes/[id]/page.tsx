@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { FormularioOperacao } from "../formulario-operacao";
 import { atualizarOperacao, excluirOperacao } from "../actions";
 
@@ -28,13 +30,17 @@ export default async function PaginaEditarOperacao({
   if (!operacao) notFound();
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Editar operação</h1>
-      <FormularioOperacao
-        operacao={operacao}
-        maquinas={maquinas ?? []}
-        acao={atualizarOperacao.bind(null, id)}
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Editar operação" />
+      <Card className="max-w-lg">
+        <CardContent>
+          <FormularioOperacao
+            operacao={operacao}
+            maquinas={maquinas ?? []}
+            acao={atualizarOperacao.bind(null, id)}
+          />
+        </CardContent>
+      </Card>
       <form action={excluirOperacao.bind(null, id)}>
         <Button variant="destructive" type="submit">
           Excluir operação

@@ -1,5 +1,7 @@
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { FormularioOperacao } from "../formulario-operacao";
 import { criarOperacao } from "../actions";
 
@@ -14,9 +16,13 @@ export default async function PaginaNovaOperacao() {
     .order("nome");
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Nova operação</h1>
-      <FormularioOperacao maquinas={maquinas ?? []} acao={criarOperacao} />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Nova operação" />
+      <Card className="max-w-lg">
+        <CardContent>
+          <FormularioOperacao maquinas={maquinas ?? []} acao={criarOperacao} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

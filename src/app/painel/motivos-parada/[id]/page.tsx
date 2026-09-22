@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { FormularioMotivo } from "../formulario-motivo";
 import { atualizarMotivoParada, excluirMotivoParada } from "../actions";
 
@@ -21,12 +23,16 @@ export default async function PaginaEditarMotivoParada({
   if (!motivo) notFound();
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Editar motivo de parada</h1>
-      <FormularioMotivo
-        nome={motivo.nome}
-        acao={atualizarMotivoParada.bind(null, id)}
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Editar motivo de parada" />
+      <Card className="max-w-lg">
+        <CardContent>
+          <FormularioMotivo
+            nome={motivo.nome}
+            acao={atualizarMotivoParada.bind(null, id)}
+          />
+        </CardContent>
+      </Card>
       <form action={excluirMotivoParada.bind(null, id)}>
         <Button variant="destructive" type="submit">
           Excluir motivo

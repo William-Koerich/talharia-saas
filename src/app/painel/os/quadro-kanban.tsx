@@ -42,7 +42,7 @@ function Cartao({ os }: { os: OSCard }) {
             }
           : undefined
       }
-      className={`bg-card cursor-grab rounded border p-2 text-sm shadow-sm active:cursor-grabbing ${isDragging ? "opacity-50" : ""}`}
+      className={`bg-card ring-foreground/10 cursor-grab rounded-lg p-3 text-sm shadow-sm ring-1 transition-shadow hover:shadow-md active:cursor-grabbing ${isDragging ? "opacity-50" : ""}`}
     >
       <Link
         href={`/painel/os/${os.id}`}
@@ -71,11 +71,13 @@ function Coluna({ status, ordens }: { status: OsStatus; ordens: OSCard[] }) {
   return (
     <div
       ref={setNodeRef}
-      className={`flex w-64 shrink-0 flex-col gap-2 rounded border p-2 ${isOver ? "bg-muted" : ""}`}
+      className={`bg-secondary/40 flex w-64 shrink-0 flex-col gap-2 rounded-xl border p-2 transition-colors ${isOver ? "bg-accent" : ""}`}
     >
-      <h3 className="text-sm font-semibold">
-        {rotulo}{" "}
-        <span className="text-muted-foreground">({ordens.length})</span>
+      <h3 className="flex items-center justify-between px-1 pt-1 text-sm font-semibold">
+        {rotulo}
+        <span className="text-muted-foreground bg-background rounded-full px-1.5 py-0.5 text-xs font-normal">
+          {ordens.length}
+        </span>
       </h3>
       <div className="flex flex-col gap-2">
         {ordens.map((os) => (

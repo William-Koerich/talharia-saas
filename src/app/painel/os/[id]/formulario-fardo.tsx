@@ -22,7 +22,11 @@ export function FormularioFardo({
     >
       <div className="flex flex-1 flex-col gap-2">
         <Label htmlFor="descricao-fardo">Descrição (opcional)</Label>
-        <Input id="descricao-fardo" name="descricao" placeholder="Ex.: dianteira P/M" />
+        <Input
+          id="descricao-fardo"
+          name="descricao"
+          placeholder="Ex.: dianteira P/M"
+        />
       </div>
       <Button type="submit" disabled={pending}>
         {pending ? "Criando..." : "Criar fardo"}

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getSessaoAtual } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { gerarPdfEtiqueta, gerarZpl, type TamanhoEtiqueta } from "@/lib/etiqueta";
+import {
+  gerarPdfEtiqueta,
+  gerarZpl,
+  type TamanhoEtiqueta,
+} from "@/lib/etiqueta";
 
 export async function GET(
   request: Request,

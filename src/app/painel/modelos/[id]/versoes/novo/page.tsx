@@ -1,4 +1,6 @@
 import { exigirGestor } from "@/lib/auth";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { FormularioVersao } from "../formulario-versao";
 import { criarVersao } from "../actions";
 
@@ -9,9 +11,13 @@ export default async function PaginaNovaVersao({
   const { id } = await params;
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Nova versão</h1>
-      <FormularioVersao acao={criarVersao.bind(null, id)} />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Nova versão" />
+      <Card className="max-w-lg">
+        <CardContent>
+          <FormularioVersao acao={criarVersao.bind(null, id)} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

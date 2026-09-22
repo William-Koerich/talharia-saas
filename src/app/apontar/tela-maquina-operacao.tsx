@@ -96,7 +96,7 @@ export function TelaMaquinaOperacao({
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Máquina / posto</label>
         <Select value={maquinaId} onValueChange={(v) => setMaquinaId(v ?? "")}>
-          <SelectTrigger className="h-14 w-full text-lg">
+          <SelectTrigger className="h-14 w-full rounded-xl text-lg">
             <SelectValue>
               {(valor: string | null) =>
                 referencia?.maquinas.find((m) => m.id === valor)?.nome ??
@@ -120,7 +120,7 @@ export function TelaMaquinaOperacao({
           value={operacaoId}
           onValueChange={(v) => setOperacaoId(v ?? "")}
         >
-          <SelectTrigger className="h-14 w-full text-lg">
+          <SelectTrigger className="h-14 w-full rounded-xl text-lg">
             <SelectValue>
               {(valor: string | null) =>
                 referencia?.operacoes.find((o) => o.id === valor)?.nome ??
@@ -143,7 +143,7 @@ export function TelaMaquinaOperacao({
       </div>
 
       <Button
-        className="h-16 text-xl"
+        className="h-16 rounded-2xl text-xl"
         disabled={!maquinaId || !operacaoId || iniciando}
         onClick={iniciar}
       >

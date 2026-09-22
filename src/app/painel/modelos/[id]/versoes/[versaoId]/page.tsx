@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import {
   Table,
   TableBody,
@@ -84,190 +87,216 @@ export default async function PaginaVersao({
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-xl font-semibold">
-          {modelo.nome} — v{versao.versao}
-        </h1>
-        {!versao.vigente && (
-          <p className="text-destructive mt-1 text-sm">
-            Esta não é a versão vigente — não pode ser usada em novas Ordens de
-            Serviço.
-          </p>
-        )}
-      </div>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-2">
+            {modelo.nome} — v{versao.versao}
+            <Badge variant={versao.vigente ? "default" : "secondary"}>
+              {versao.vigente ? "Vigente" : "Antiga"}
+            </Badge>
+          </span>
+        }
+        description={
+          !versao.vigente && (
+            <span className="text-destructive">
+              Esta não é a versão vigente — não pode ser usada em novas Ordens
+              de Serviço.
+            </span>
+          )
+        }
+      />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Detalhes</h2>
-        <FormularioDetalhes
-          versao={versao}
-          modeloId={modeloId}
-          versaoId={versaoId}
-          acao={atualizarVersao.bind(null, modeloId, versaoId)}
-        />
-      </section>
+      <Card className="max-w-lg">
+        <CardHeader>
+          <CardTitle>Detalhes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FormularioDetalhes
+            versao={versao}
+            modeloId={modeloId}
+            versaoId={versaoId}
+            acao={atualizarVersao.bind(null, modeloId, versaoId)}
+          />
+        </CardContent>
+      </Card>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Partes</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Qtd/peça</TableHead>
-              <TableHead>Sentido do fio</TableHead>
-              <TableHead>Par</TableHead>
-              <TableHead>Entretela</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {partes?.map((parte) => (
-              <TableRow key={parte.id}>
-                <TableCell>{parte.nome}</TableCell>
-                <TableCell>{parte.qtd_por_peca}</TableCell>
-                <TableCell>
-                  {SENTIDO_FIO_LABEL[parte.sentido_fio] ?? parte.sentido_fio}
-                </TableCell>
-                <TableCell>{parte.par ? "Sim" : "Não"}</TableCell>
-                <TableCell>{parte.entretela ? "Sim" : "Não"}</TableCell>
-                <TableCell className="text-right">
+      <Card>
+        <CardHeader>
+          <CardTitle>Partes</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Qtd/peça</TableHead>
+                <TableHead>Sentido do fio</TableHead>
+                <TableHead>Par</TableHead>
+                <TableHead>Entretela</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {partes?.map((parte) => (
+                <TableRow key={parte.id}>
+                  <TableCell>{parte.nome}</TableCell>
+                  <TableCell>{parte.qtd_por_peca}</TableCell>
+                  <TableCell>
+                    {SENTIDO_FIO_LABEL[parte.sentido_fio] ?? parte.sentido_fio}
+                  </TableCell>
+                  <TableCell>{parte.par ? "Sim" : "Não"}</TableCell>
+                  <TableCell>{parte.entretela ? "Sim" : "Não"}</TableCell>
+                  <TableCell className="text-right">
+                    <form
+                      action={removerParte.bind(
+                        null,
+                        modeloId,
+                        versaoId,
+                        parte.id,
+                      )}
+                    >
+                      <Button variant="ghost" size="sm" type="submit">
+                        Remover
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {partes?.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhuma parte cadastrada.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <FormularioParte
+            acao={adicionarParte.bind(null, modeloId, versaoId)}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Grade e consumo teórico por tamanho</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tamanho</TableHead>
+                <TableHead>Consumo (m)</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {consumos?.map((consumo) => (
+                <TableRow key={consumo.id}>
+                  <TableCell>{consumo.tamanho}</TableCell>
+                  <TableCell>{consumo.consumo_metros}</TableCell>
+                  <TableCell className="text-right">
+                    <form
+                      action={removerConsumo.bind(
+                        null,
+                        modeloId,
+                        versaoId,
+                        consumo.id,
+                      )}
+                    >
+                      <Button variant="ghost" size="sm" type="submit">
+                        Remover
+                      </Button>
+                    </form>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {consumos?.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="text-muted-foreground text-center"
+                  >
+                    Nenhum tamanho cadastrado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <FormularioConsumo
+            acao={adicionarConsumo.bind(null, modeloId, versaoId)}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Arquivos</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
+            {arquivosComUrl.map((arquivo) => (
+              <div
+                key={arquivo.id}
+                className="flex flex-col gap-2 border-b pb-4 last:border-0 last:pb-0"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">
+                    {rotuloTipoArquivo(arquivo.tipo)} — {arquivo.nome_original}
+                  </p>
                   <form
-                    action={removerParte.bind(
+                    action={excluirArquivo.bind(
                       null,
                       modeloId,
                       versaoId,
-                      parte.id,
+                      arquivo.id,
+                      arquivo.storage_path,
                     )}
                   >
                     <Button variant="ghost" size="sm" type="submit">
-                      Remover
+                      Excluir
                     </Button>
                   </form>
-                </TableCell>
-              </TableRow>
-            ))}
-            {partes?.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="text-muted-foreground text-center"
-                >
-                  Nenhuma parte cadastrada.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <FormularioParte acao={adicionarParte.bind(null, modeloId, versaoId)} />
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">
-          Grade e consumo teórico por tamanho
-        </h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Tamanho</TableHead>
-              <TableHead>Consumo (m)</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {consumos?.map((consumo) => (
-              <TableRow key={consumo.id}>
-                <TableCell>{consumo.tamanho}</TableCell>
-                <TableCell>{consumo.consumo_metros}</TableCell>
-                <TableCell className="text-right">
-                  <form
-                    action={removerConsumo.bind(
-                      null,
-                      modeloId,
-                      versaoId,
-                      consumo.id,
-                    )}
-                  >
-                    <Button variant="ghost" size="sm" type="submit">
-                      Remover
-                    </Button>
-                  </form>
-                </TableCell>
-              </TableRow>
-            ))}
-            {consumos?.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-muted-foreground text-center"
-                >
-                  Nenhum tamanho cadastrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <FormularioConsumo
-          acao={adicionarConsumo.bind(null, modeloId, versaoId)}
-        />
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Arquivos</h2>
-        <div className="flex flex-col gap-4">
-          {arquivosComUrl.map((arquivo) => (
-            <div key={arquivo.id} className="flex flex-col gap-2 border-b pb-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {rotuloTipoArquivo(arquivo.tipo)} — {arquivo.nome_original}
-                </p>
-                <form
-                  action={excluirArquivo.bind(
-                    null,
-                    modeloId,
-                    versaoId,
-                    arquivo.id,
-                    arquivo.storage_path,
-                  )}
-                >
-                  <Button variant="ghost" size="sm" type="submit">
-                    Excluir
-                  </Button>
-                </form>
-              </div>
-              {arquivo.url && arquivo.tipo === "croqui" && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={arquivo.url}
-                  alt={arquivo.nome_original ?? ""}
-                  className="max-w-sm rounded border"
-                />
-              )}
-              {arquivo.url && arquivo.tipo === "risco_pdf" && (
-                <iframe
-                  src={arquivo.url}
-                  className="h-96 w-full rounded border"
-                />
-              )}
-              {arquivo.url &&
-                (arquivo.tipo === "plt" || arquivo.tipo === "dxf") && (
-                  <a
-                    href={arquivo.url}
-                    className="text-primary text-sm underline-offset-4 hover:underline"
-                  >
-                    Baixar arquivo
-                  </a>
+                </div>
+                {arquivo.url && arquivo.tipo === "croqui" && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={arquivo.url}
+                    alt={arquivo.nome_original ?? ""}
+                    className="max-w-sm rounded-lg border"
+                  />
                 )}
-            </div>
-          ))}
-          {arquivosComUrl.length === 0 && (
-            <p className="text-muted-foreground text-sm">
-              Nenhum arquivo enviado.
-            </p>
-          )}
-        </div>
-        <FormularioArquivo
-          acao={enviarArquivo.bind(null, modeloId, versaoId)}
-        />
-      </section>
+                {arquivo.url && arquivo.tipo === "risco_pdf" && (
+                  <iframe
+                    src={arquivo.url}
+                    className="h-96 w-full rounded-lg border"
+                  />
+                )}
+                {arquivo.url &&
+                  (arquivo.tipo === "plt" || arquivo.tipo === "dxf") && (
+                    <a
+                      href={arquivo.url}
+                      className="text-primary text-sm underline-offset-4 hover:underline"
+                    >
+                      Baixar arquivo
+                    </a>
+                  )}
+              </div>
+            ))}
+            {arquivosComUrl.length === 0 && (
+              <p className="text-muted-foreground text-sm">
+                Nenhum arquivo enviado.
+              </p>
+            )}
+          </div>
+          <FormularioArquivo
+            acao={enviarArquivo.bind(null, modeloId, versaoId)}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

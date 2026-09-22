@@ -112,13 +112,13 @@ export function TelaBuscarOS({
       {escaneando ? (
         <Button
           variant="outline"
-          className="h-14 text-lg"
+          className="h-14 rounded-xl text-lg"
           onClick={pararCamera}
         >
           Cancelar
         </Button>
       ) : (
-        <Button className="h-16 text-lg" onClick={iniciarCamera}>
+        <Button className="h-16 rounded-2xl text-lg" onClick={iniciarCamera}>
           Ler QR da OS
         </Button>
       )}
@@ -131,11 +131,14 @@ export function TelaBuscarOS({
           <Input
             id="codigo-os"
             inputMode="numeric"
-            className="h-14 text-lg"
+            className="h-14 rounded-xl text-lg"
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
           />
-          <Button className="h-14" onClick={() => buscarPorNumero(codigo)}>
+          <Button
+            className="h-14 rounded-xl"
+            onClick={() => buscarPorNumero(codigo)}
+          >
             Buscar
           </Button>
         </div>

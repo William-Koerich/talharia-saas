@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Download, ArrowLeft } from "lucide-react";
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import {
   Table,
   TableBody,
@@ -84,138 +87,169 @@ export default async function PaginaRomaneioDetalhe({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Romaneio — {cliente?.nome ?? "—"}</h1>
-          <p className="text-muted-foreground text-sm">
-            {totalConferido}/{itens.length} fardos conferidos
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge>{ROTULO_STATUS[romaneio.status] ?? romaneio.status}</Badge>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-2">
+            Romaneio — {cliente?.nome ?? "—"}
+            <Badge>{ROTULO_STATUS[romaneio.status] ?? romaneio.status}</Badge>
+          </span>
+        }
+        description={`${totalConferido}/${itens.length} fardos conferidos`}
+        actions={
           <Button
             variant="outline"
             render={<a href={`/api/romaneios/${id}/pdf`} />}
             nativeButton={false}
           >
+            <Download className="size-4" />
             Baixar PDF
           </Button>
-        </div>
-      </div>
+        }
+      />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Fardos</h2>
-        {romaneio.status === "rascunho" && (
-          <ConferenciaQr
-            itens={itens.map((i) => ({
-              id: i.id,
-              etiquetaCodigo: i.etiquetaCodigo,
-              conferido: i.conferido,
-            }))}
-            acao={alternarConferidoItem.bind(null, id)}
-          />
-        )}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Conferido</TableHead>
-              {romaneio.status === "rascunho" && (
-                <TableHead className="text-right">Ações</TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {itens.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.etiquetaCodigo}</TableCell>
-                <TableCell>{item.descricao ?? "—"}</TableCell>
-                <TableCell>
-                  <Badge variant={item.conferido ? "default" : "secondary"}>
-                    {item.conferido ? "Sim" : "Não"}
-                  </Badge>
-                </TableCell>
+      <Card>
+        <CardHeader>
+          <CardTitle>Fardos</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          {romaneio.status === "rascunho" && (
+            <ConferenciaQr
+              itens={itens.map((i) => ({
+                id: i.id,
+                etiquetaCodigo: i.etiquetaCodigo,
+                conferido: i.conferido,
+              }))}
+              acao={alternarConferidoItem.bind(null, id)}
+            />
+          )}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Código</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Conferido</TableHead>
                 {romaneio.status === "rascunho" && (
-                  <TableCell className="text-right">
-                    <form
-                      action={alternarConferidoItem.bind(
-                        null,
-                        id,
-                        item.id,
-                        !item.conferido,
-                      )}
-                    >
-                      <Button variant="ghost" size="sm" type="submit">
-                        {item.conferido ? "Desconferir" : "Marcar conferido"}
-                      </Button>
-                    </form>
-                  </TableCell>
+                  <TableHead className="text-right">Ações</TableHead>
                 )}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {itens.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.etiquetaCodigo}</TableCell>
+                  <TableCell>{item.descricao ?? "—"}</TableCell>
+                  <TableCell>
+                    <Badge variant={item.conferido ? "default" : "secondary"}>
+                      {item.conferido ? "Sim" : "Não"}
+                    </Badge>
+                  </TableCell>
+                  {romaneio.status === "rascunho" && (
+                    <TableCell className="text-right">
+                      <form
+                        action={alternarConferidoItem.bind(
+                          null,
+                          id,
+                          item.id,
+                          !item.conferido,
+                        )}
+                      >
+                        <Button variant="ghost" size="sm" type="submit">
+                          {item.conferido ? "Desconferir" : "Marcar conferido"}
+                        </Button>
+                      </form>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-        {romaneio.status === "rascunho" && (
-          <form action={marcarRomaneioConferido.bind(null, id)}>
-            <Button type="submit" disabled={!todosConferidos}>
-              Marcar romaneio como conferido
-            </Button>
-          </form>
-        )}
-      </section>
+          {romaneio.status === "rascunho" && (
+            <form
+              action={marcarRomaneioConferido.bind(null, id)}
+              className="w-fit"
+            >
+              <Button type="submit" disabled={!todosConferidos}>
+                Marcar romaneio como conferido
+              </Button>
+            </form>
+          )}
+        </CardContent>
+      </Card>
 
       {romaneio.status === "conferido" && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Finalizar entrega</h2>
-          <CapturaEntrega acao={finalizarEntrega.bind(null, id)} />
-        </section>
+        <Card>
+          <CardHeader>
+            <CardTitle>Finalizar entrega</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CapturaEntrega acao={finalizarEntrega.bind(null, id)} />
+          </CardContent>
+        </Card>
       )}
 
       {romaneio.status === "entregue" && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Entrega confirmada</h2>
-          <p className="text-sm">Data de entrega: {romaneio.data_entrega}</p>
-          <div className="flex flex-wrap gap-6">
-            {fotoUrl && (
-              <a href={fotoUrl} target="_blank" rel="noreferrer" className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Foto</span>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={fotoUrl} alt="Foto da entrega" className="h-40 rounded border object-cover" />
-              </a>
-            )}
-            {assinaturaUrl && (
-              <a
-                href={assinaturaUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex flex-col gap-1"
-              >
-                <span className="text-sm font-medium">Assinatura</span>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={assinaturaUrl}
-                  alt="Assinatura do recebedor"
-                  className="h-40 rounded border bg-white object-contain"
-                />
-              </a>
-            )}
-          </div>
-        </section>
+        <Card>
+          <CardHeader>
+            <CardTitle>Entrega confirmada</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="text-sm">Data de entrega: {romaneio.data_entrega}</p>
+            <div className="flex flex-wrap gap-6">
+              {fotoUrl && (
+                <a
+                  href={fotoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-col gap-1"
+                >
+                  <span className="text-sm font-medium">Foto</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={fotoUrl}
+                    alt="Foto da entrega"
+                    className="h-40 rounded-lg border object-cover"
+                  />
+                </a>
+              )}
+              {assinaturaUrl && (
+                <a
+                  href={assinaturaUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex flex-col gap-1"
+                >
+                  <span className="text-sm font-medium">Assinatura</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={assinaturaUrl}
+                    alt="Assinatura do recebedor"
+                    className="h-40 rounded-lg border bg-white object-contain"
+                  />
+                </a>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {romaneio.status === "rascunho" && (
-        <form action={excluirRomaneio.bind(null, id)}>
-          <Button variant="destructive" type="submit">
-            Excluir romaneio
-          </Button>
-        </form>
-      )}
-
-      <Button variant="ghost" render={<Link href="/painel/romaneios" />} nativeButton={false} className="w-fit">
-        Voltar
-      </Button>
+      <div className="flex items-center gap-2">
+        {romaneio.status === "rascunho" && (
+          <form action={excluirRomaneio.bind(null, id)}>
+            <Button variant="destructive" type="submit">
+              Excluir romaneio
+            </Button>
+          </form>
+        )}
+        <Button
+          variant="ghost"
+          render={<Link href="/painel/romaneios" />}
+          nativeButton={false}
+        >
+          <ArrowLeft className="size-4" />
+          Voltar
+        </Button>
+      </div>
     </div>
   );
 }

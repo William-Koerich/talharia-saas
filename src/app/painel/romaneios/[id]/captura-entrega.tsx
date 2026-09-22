@@ -1,6 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+} from "react";
 import { Button } from "@/components/ui/button";
 import type { EstadoForm } from "../actions";
 
@@ -34,7 +40,10 @@ export function CapturaEntrega({
     ctx.lineCap = "round";
   }, []);
 
-  useEffect(() => () => streamRef.current?.getTracks().forEach((t) => t.stop()), []);
+  useEffect(
+    () => () => streamRef.current?.getTracks().forEach((t) => t.stop()),
+    [],
+  );
 
   async function iniciarCamera() {
     try {
@@ -57,13 +66,17 @@ export function CapturaEntrega({
     const canvas = fotoCanvasRef.current;
     if (!video || !canvas) return;
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      setAvisoCamera("Câmera ainda carregando, aguarde um instante e tente novamente.");
+      setAvisoCamera(
+        "Câmera ainda carregando, aguarde um instante e tente novamente.",
+      );
       return;
     }
     setAvisoCamera(null);
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas
+      .getContext("2d")
+      ?.drawImage(video, 0, 0, canvas.width, canvas.height);
     setFotoCapturada(true);
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setCameraAtiva(false);
@@ -109,7 +122,8 @@ export function CapturaEntrega({
   async function finalizarEntrega() {
     const fotoCanvas = fotoCanvasRef.current;
     const assinaturaCanvas = assinaturaCanvasRef.current;
-    if (!fotoCanvas || !fotoCapturada || !assinaturaCanvas || assinaturaVazia) return;
+    if (!fotoCanvas || !fotoCapturada || !assinaturaCanvas || assinaturaVazia)
+      return;
 
     const fotoBlob = await new Promise<Blob | null>((resolve) =>
       fotoCanvas.toBlob(resolve, "image/jpeg", 0.85),
@@ -120,7 +134,10 @@ export function CapturaEntrega({
     if (!fotoBlob || !assinaturaBlob) return;
 
     const formData = new FormData();
-    formData.set("foto", new File([fotoBlob], "foto.jpg", { type: "image/jpeg" }));
+    formData.set(
+      "foto",
+      new File([fotoBlob], "foto.jpg", { type: "image/jpeg" }),
+    );
     formData.set(
       "assinatura",
       new File([assinaturaBlob], "assinatura.png", { type: "image/png" }),
@@ -140,19 +157,35 @@ export function CapturaEntrega({
         />
         {cameraAtiva ? (
           <div className="flex flex-col gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={capturarFoto} className="w-fit">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={capturarFoto}
+              className="w-fit"
+            >
               Capturar
             </Button>
-            {avisoCamera && <p className="text-muted-foreground text-sm">{avisoCamera}</p>}
+            {avisoCamera && (
+              <p className="text-muted-foreground text-sm">{avisoCamera}</p>
+            )}
           </div>
         ) : (
-          <Button type="button" variant="outline" size="sm" onClick={iniciarCamera} className="w-fit">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={iniciarCamera}
+            className="w-fit"
+          >
             {fotoCapturada ? "Tirar outra foto" : "Abrir câmera"}
           </Button>
         )}
         <canvas
           ref={fotoCanvasRef}
-          className={fotoCapturada ? "w-full max-w-sm rounded border" : "hidden"}
+          className={
+            fotoCapturada ? "w-full max-w-sm rounded border" : "hidden"
+          }
         />
       </div>
 
@@ -168,7 +201,13 @@ export function CapturaEntrega({
           onPointerUp={pararTraco}
           onPointerLeave={pararTraco}
         />
-        <Button type="button" variant="ghost" size="sm" onClick={limparAssinatura} className="w-fit">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={limparAssinatura}
+          className="w-fit"
+        >
           Limpar assinatura
         </Button>
       </div>

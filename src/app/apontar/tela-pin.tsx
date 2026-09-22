@@ -70,7 +70,7 @@ export function TelaPin({
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`border-foreground h-5 w-5 rounded-full border-2 ${pin.length > i ? "bg-foreground" : ""}`}
+            className={`border-primary h-5 w-5 rounded-full border-2 transition-colors ${pin.length > i ? "bg-primary" : ""}`}
           />
         ))}
       </div>
@@ -94,7 +94,7 @@ export function TelaPin({
               key={i}
               type="button"
               variant="outline"
-              className="h-20 w-20 text-3xl"
+              className="h-20 w-20 rounded-2xl text-3xl shadow-sm"
               disabled={verificando}
               onClick={() => tecla(tecla_)}
             >

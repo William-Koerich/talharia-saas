@@ -1,5 +1,7 @@
 import { exigirGestor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { FormularioOS } from "../formulario-os";
 
 export default async function PaginaNovaOS() {
@@ -49,13 +51,17 @@ export default async function PaginaNovaOS() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Nova ordem de serviço</h1>
-      <FormularioOS
-        clientes={clientes ?? []}
-        modelos={modelos}
-        horasPorPecaPorModelo={Object.fromEntries(horasPorPecaPorModelo)}
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Nova ordem de serviço" />
+      <Card className="max-w-2xl">
+        <CardContent>
+          <FormularioOS
+            clientes={clientes ?? []}
+            modelos={modelos}
+            horasPorPecaPorModelo={Object.fromEntries(horasPorPecaPorModelo)}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

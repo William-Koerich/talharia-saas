@@ -4,20 +4,7 @@ import { getSessaoAtual } from "@/lib/auth";
 import { sair } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { TrialExpirado } from "./trial-expirado";
-
-const LINKS_GESTOR = [
-  { href: "/painel/clientes", label: "Clientes" },
-  { href: "/painel/modelos", label: "Modelos" },
-  { href: "/painel/os", label: "Ordens de Serviço" },
-  { href: "/painel/romaneios", label: "Romaneios" },
-  { href: "/painel/relatorios/perdas", label: "Relatório de perdas" },
-  { href: "/painel/relatorios/margem", label: "Margem por cliente" },
-  { href: "/painel/maquinas", label: "Máquinas" },
-  { href: "/painel/operacoes", label: "Operações" },
-  { href: "/painel/motivos-parada", label: "Motivos de parada" },
-  { href: "/painel/consumiveis", label: "Consumíveis" },
-  { href: "/painel/usuarios", label: "Usuários" },
-];
+import { SidebarNav } from "./sidebar-nav";
 
 export default async function PainelLayout({
   children,
@@ -35,44 +22,61 @@ export default async function PainelLayout({
   }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="flex flex-col gap-4 border-b p-4 sm:flex-row sm:items-center sm:justify-between print:hidden">
-        <div>
-          <Link href="/painel" className="font-semibold">
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <aside className="bg-sidebar text-sidebar-foreground flex flex-col md:w-64 md:shrink-0 print:hidden">
+        <div className="flex items-center justify-between px-4 py-4 md:flex-col md:items-start md:gap-1 md:py-6">
+          <Link
+            href="/painel"
+            className="text-base font-semibold tracking-tight"
+          >
             {sessao.tenantNome}
           </Link>
-          <p className="text-muted-foreground text-sm">
-            {sessao.nome} · {sessao.role}
-          </p>
-        </div>
-        <form action={sair}>
-          <Button variant="outline" type="submit">
-            Sair
-          </Button>
-        </form>
-      </header>
-      {!sessao.assinaturaAtiva && (
-        <p className="bg-muted border-b p-2 text-center text-sm print:hidden">
-          Período de teste: {sessao.diasRestantesTrial}{" "}
-          {sessao.diasRestantesTrial === 1 ? "dia restante" : "dias restantes"}.
-        </p>
-      )}
-      {sessao.role !== "OPERADOR" && (
-        <nav className="flex flex-wrap gap-1 border-b p-2 print:hidden">
-          {LINKS_GESTOR.map((link) => (
+          <form action={sair} className="md:hidden">
             <Button
-              key={link.href}
               variant="ghost"
               size="sm"
-              render={<Link href={link.href} />}
-              nativeButton={false}
+              type="submit"
+              className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
-              {link.label}
+              Sair
             </Button>
-          ))}
-        </nav>
-      )}
-      <main className="flex flex-1 flex-col p-4">{children}</main>
+          </form>
+        </div>
+
+        {sessao.role !== "OPERADOR" && <SidebarNav />}
+
+        <div className="border-sidebar-border mt-auto hidden flex-col gap-3 border-t px-4 py-4 md:flex">
+          <div className="text-sm">
+            <p className="font-medium">{sessao.nome}</p>
+            <p className="text-sidebar-foreground/60 text-xs">{sessao.role}</p>
+          </div>
+          <form action={sair}>
+            <Button
+              variant="outline"
+              size="sm"
+              type="submit"
+              className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-full bg-transparent"
+            >
+              Sair
+            </Button>
+          </form>
+        </div>
+      </aside>
+
+      <div className="flex flex-1 flex-col">
+        {!sessao.assinaturaAtiva && (
+          <p className="bg-accent text-accent-foreground px-4 py-2 text-center text-sm print:hidden">
+            Período de teste: {sessao.diasRestantesTrial}{" "}
+            {sessao.diasRestantesTrial === 1
+              ? "dia restante"
+              : "dias restantes"}
+            .
+          </p>
+        )}
+        <main className="flex flex-1 flex-col gap-6 p-4 md:p-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

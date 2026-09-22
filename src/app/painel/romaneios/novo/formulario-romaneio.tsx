@@ -44,7 +44,11 @@ export function FormularioRomaneio({
         )}
       </div>
 
-      <Button type="submit" disabled={pending || fardos.length === 0} className="w-fit">
+      <Button
+        type="submit"
+        disabled={pending || fardos.length === 0}
+        className="w-fit"
+      >
         {pending ? "Criando..." : "Criar romaneio"}
       </Button>
       {estado.erro && <p className="text-destructive text-sm">{estado.erro}</p>}
